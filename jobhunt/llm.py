@@ -56,6 +56,20 @@ def parse_json(raw: str) -> Any:
             return json.loads(blob)
         except json.JSONDecodeError:
             continue
+
+    # Fallback: extract all complete individual JSON objects if array was truncated
+    if "[" in cleaned or "{" in cleaned:
+        objects = []
+        for match in re.finditer(r"\{[^{}]*\}", cleaned):
+            try:
+                obj = json.loads(match.group(0))
+                if isinstance(obj, dict):
+                    objects.append(obj)
+            except json.JSONDecodeError:
+                continue
+        if objects:
+            return objects
+
     raise ValueError(f"could not parse JSON from model reply: {cleaned[:300]!r}")
 
 
