@@ -248,9 +248,11 @@ def draft(jobs: list[Job], profile: dict, jd_chars: int = 6000,
                 "questions_to_ask": [str(q) for q in (kit.get("questions_to_ask") or [])],
             }
             print(f"  drafted {j.title} @ {j.company}")
+            time.sleep(2.0)
         except (LLMError, ValueError, KeyError, TypeError) as e:
             print(f"  ! draft failed for {j.job_id} ({type(e).__name__}: {e})")
             j.draft = {k: ("" if k in ("fit_summary", "cover_note") else []) for k in DRAFT_KEYS}
+            time.sleep(1.0)
 
     return jobs
 
