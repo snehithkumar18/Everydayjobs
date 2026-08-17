@@ -17,18 +17,17 @@ from typing import Any
 from .fetch import Job
 from .providers import LLMError, Provider, resolve
 
+import time
+
 _FENCE_OPEN = re.compile(r"^\s*```(?:json|JSON)?\s*", re.M)
 _FENCE_CLOSE = re.compile(r"\s*```\s*$", re.M)
 
 DRAFT_KEYS = ("fit_summary", "tailored_bullets", "gaps", "cover_note", "questions_to_ask")
 
-# Output ceilings per stage. These are deliberately generous: reasoning models
-# (Gemini 2.5+, and anything with thinking on) spend output tokens before the
-# answer starts, so a ceiling sized to the visible answer gets consumed and you
-# get truncated JSON instead of a result.
-SCREEN_MAX_TOKENS = 4000
-DRAFT_MAX_TOKENS = 8000
-PROFILE_MAX_TOKENS = 4000
+# Output ceilings per stage.
+SCREEN_MAX_TOKENS = 8192
+DRAFT_MAX_TOKENS = 8192
+PROFILE_MAX_TOKENS = 8192
 
 
 def parse_json(raw: str) -> Any:
@@ -193,6 +192,7 @@ def screen(jobs: list[Job], profile: dict, batch_size: int = 8, jd_chars: int = 
             j.reason = str(r.get("reason", "")).strip()
 
         print(f"  screened {min(start + batch_size, len(jobs))}/{len(jobs)}")
+        time.sleep(0.5)
 
     return jobs
 
