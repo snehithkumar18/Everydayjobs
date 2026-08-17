@@ -149,6 +149,8 @@ companies:
   - {ats: greenhouse, slug: unacademy,         name: Unacademy}
   - {ats: greenhouse, slug: epifi,             name: Fi Money}
   - {ats: greenhouse, slug: sprinkler,         name: Sprinklr}
+  - {ats: greenhouse, slug: tcs,               name: TCS}
+  - {ats: greenhouse, slug: thoughtworks,      name: Thoughtworks}
   - {ats: greenhouse, slug: rubrik,            name: Rubrik}
   - {ats: greenhouse, slug: nutanix,           name: Nutanix}
   - {ats: greenhouse, slug: coherehealth,      name: Cohere Health}

@@ -7,49 +7,53 @@ filters:
   include_titles:
     # SDE & General Software
     - '\b(sde|sde-?1|sde-?2|sde-?i|sde-?ii)\b'
-    - '\b(software\s+development\s+engineer)\b'
-    - '\b(software\s+engineer|software\s+developer)\b'
-    - '\b(site\s+reliability\s+engineer|sre)\b'
-    - '\b(backend|back\s*end)\b.*\b(engineer|developer)\b'
-    - '\bapplication\s+developer\b'
+    # Software / Backend / Full Stack
+    - '\b(software\s+development\s+engineer|sde|swe)\b'
+    - '\b(software\s+engineer|software\s+developer|application\s+developer|app\s+developer)\b'
+    - '\b(associate\s+software\s+engineer|junior\s+software\s+engineer|graduate\s+software\s+engineer)\b'
+    - '\b(backend|back[- ]end)\s+(engineer|developer|software\s+engineer)\b'
+    - '\bfull[- ]?stack\b.*\b(engineer|developer|application\s+developer)\b'
+    - '\bapi\s+(developer|engineer)\b'
 
-    # AI / ML / GenAI roles
-    - '\b(artificial\s+intelligence|ai)\b.*\b(engineer|scientist|researcher|developer)\b'
-    - '\b(machine\s+learning|ml)\b.*\b(engineer|scientist|researcher|developer)\b'
-    - '\b(deep\s+learning)\b.*\b(engineer|scientist|researcher)\b'
-    - '\b(generative\s+ai|genai|gen-ai)\b.*\b(engineer|scientist|researcher|developer)\b'
-    - '\bllm\b.*\b(engineer|scientist|researcher)\b'
-    - '\bnlp\b.*\b(engineer|scientist|researcher)\b'
-    - '\b(computer\s+vision)\b.*\b(engineer|scientist)\b'
+    # Python & Java Specialist Roles
+    - '\bpython\b.*\b(developer|engineer|backend\s+developer|software\s+engineer)\b'
+    - '\bjava\b(?!\s*script).*\b(developer|engineer|software\s+engineer)\b'
+
+    # Applied AI / Machine Learning / GenAI / LLM / Agentic
+    - '\b(applied\s+)?(artificial\s+intelligence|ai)\b.*\b(engineer|developer|software\s+engineer|application\s+engineer|solutions\s+engineer)\b'
+    - '\b(applied\s+)?(machine\s+learning|ml)\b.*\b(engineer|developer|software\s+engineer)\b'
+    - '\b(generative\s+ai|genai|gen-ai)\b.*\b(engineer|developer|application\s+engineer)\b'
+    - '\bllm\b.*\b(engineer|developer|application\s+engineer|application\s+developer)\b'
+    - '\b(ai\s+agent|agentic\s+ai|ai\s+automation|ai\s+solutions|ai\s+workflow)\b.*\b(engineer|developer)\b'
+    - '\bprompt\s+engineer\b'
+    - '\bdeep\s+learning\b.*\b(engineer|developer)\b'
+
+    # Computer Vision & Image Processing
+    - '\b(computer\s+vision|vision\s+ai|image\s+processing)\b.*\b(engineer|developer|software\s+engineer|ml\s+engineer|ai\s+engineer)\b'
+
+    # Database & Data Engineering
+    - '\b(postgresql|sql|database)\s+(developer|engineer)\b'
+    - '\b(data\s+engineer|junior\s+data\s+engineer|ai\s+data\s+engineer|ml\s+data\s+engineer)\b'
+    - '\b(data\s+quality|data\s+processing|data\s+operations)\b.*\b(engineer|developer)\b'
+
+    # Cloud / DevOps / SRE / QA & Testing
+    - '\b(site\s+reliability\s+engineer|sre)\b'
+    - '\b(cloud\s+software\s+engineer|software\s+engineer\s*-\s*cloud|junior\s+devops|devops\s+engineer)\b'
+    - '\b(qa\s+automation|software\s+testing|automation\s+engineer|test\s+engineer)\b'
     - '\bdata\s+scientist\b'
-    - '\bml\s+engineer\b'
-    - '\bai\s+engineer\b'
-    - '\bmlops\b.*\b(engineer)\b'
-    
-    # Python / Java / Full Stack roles
-    - '\bpython\b.*\b(developer|engineer)\b'
-    - '\bjava\b.*\b(developer|engineer)\b'
-    - '\bfull\s*stack\b.*\b(developer|engineer)\b'
-    - '\bfullstack\b.*\b(developer|engineer)\b'
-    - '\bfront\s*end\b.*\b(developer|engineer)\b'
-    - '\bfrontend\b.*\b(developer|engineer)\b'
-    
-    # Data / SQL related roles
-    - '\bdata\s+engineer\b'
-    - '\bdata\s+developer\b'
-    - '\b(etl|pipeline)\b.*\b(engineer|developer)\b'
-    - '\bdatabase\b.*\b(engineer|developer)\b'
-    - '\bsql\b.*\b(developer|engineer)\b'
-    - '\b(big\s+data)\b.*\b(engineer|developer)\b'
+
+    # MNC Entry-Level & Fresher Programs (TCS, Infosys, Wipro, etc.)
+    - '\b(graduate\s+engineer\s+trainee|get|trainee\s+engineer|associate\s+engineer|fresher\s+engineer|system\s+engineer\s+trainee)\b'
+    - '\bentry\s*level\b.*\b(engineer|developer|software)\b'
+    - '\bfresher\b'
 
   # Anything matching these is dropped even if an include matched.
   exclude_titles:
-    - '\b(director|vp|vice president|head of|chief|cto)\b'
-    - '\b(manager|management)\b'
-    - '\b(staff|principal|lead\s+architect|distinguished)\b' # too senior
-    - '\b(intern|internship|apprentice|trainee)\b'            # too junior
-    - '\b(sales|account executive|marketing|recruit|support|success)\b'
-    - '\b(ios|android|mobile|game)\b' # wrong discipline
+    - '\b(senior|sr\.?|principal|staff|lead|chief|head\s+of|director|vp|vice\s+president|distinguished|architect)\b' # too senior
+    - '\b(manager|management|coordinator|executive\s+assistant)\b'
+    - '\b(sales|account\s+executive|marketing|recruit|recruiter|customer\s+support|customer\s+success|business\s+development)\b'
+    - '\b(ios|android|mobile|flutter|react\s+native|game\s+developer)\b' # wrong discipline
+    - '\b(front\s*end|frontend)\b.*\b(developer|engineer)\b'             # focus on Full Stack / Backend / AI
 
   # Substrings matched against "<location> <title>", case-insensitive.
   # If allow_remote is true, all remote roles across the world automatically pass.
