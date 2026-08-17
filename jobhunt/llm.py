@@ -194,7 +194,7 @@ def screen(jobs: list[Job], profile: dict, batch_size: int = 8, jd_chars: int = 
             j.reason = str(r.get("reason", "")).strip()
 
         print(f"  screened {min(start + batch_size, len(jobs))}/{len(jobs)}")
-        time.sleep(0.5)
+        time.sleep(2.0)
 
     return jobs
 

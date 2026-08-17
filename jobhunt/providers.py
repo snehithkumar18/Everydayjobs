@@ -126,15 +126,18 @@ class GeminiProvider(Provider):
     BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
     def _post(self, model: str, body: dict) -> str:
-        for attempt in range(4):
+        for attempt in range(5):
             r = requests.post(
                 f"{self.BASE}/{model}:generateContent",
                 params={"key": self._env("GEMINI_API_KEY")},
                 json=body,
                 timeout=TIMEOUT,
             )
-            if r.status_code in (429, 500, 503) and attempt < 3:
-                time.sleep(2 ** attempt + 1)
+            if r.status_code == 429 and attempt < 4:
+                time.sleep(10 * (attempt + 1))
+                continue
+            if r.status_code in (500, 503) and attempt < 4:
+                time.sleep(3 * (attempt + 1))
                 continue
             if r.status_code != 200:
                 raise LLMError(f"gemini HTTP {r.status_code}: {r.text[:300]}")
