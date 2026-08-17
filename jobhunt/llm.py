@@ -129,10 +129,12 @@ Score 0-10 on genuine fit:
 
 Seniority mismatch is the most common failure: a 3-year engineer scoring an 8
 on a Staff role is wrong. Penalise it hard, in both directions — a senior
-engineer does not want an internship either. Do the same for hard requirements
-the candidate plainly does not meet: security clearance, a specific degree, a
-named technology with a year count they cannot hit, or a country they cannot
-work in.
+engineer does not want an internship either.
+
+LOCATION & WORK ELIGIBILITY:
+The candidate is based in India with Indian work authorization (no US/UK/EU visa).
+- ACCEPT: Roles in India (Bangalore, Hyderabad, Mumbai, remote India, etc.) OR genuine Worldwide / Global Remote roles eligible for applicants in India.
+- REJECT (score 0-4): Any role requiring physical residence or work authorization in the US, UK, Canada, Europe, or other specific non-India countries (e.g. 'US Only', 'North America only', 'Must have US Work Authorization/Green Card', 'UK only').
 
 Do not inflate scores to be encouraging. Most postings are a 4.
 

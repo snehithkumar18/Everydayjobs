@@ -33,6 +33,13 @@ def _parse_date(value: str | None) -> datetime | None:
     return None
 
 
+RESTRICTED_NON_INDIA_PATTERNS = [
+    r"\b(us only|u\.s\. only|usa only|united states only|north america only|canada only|uk only|europe only|eu only|emea only|latam only)\b",
+    r"\b(remote\s*[-–—]\s*(?:us|usa|uk|canada|germany|france|australia))\b",
+    r"\b(remote\s*\((?:us|usa|uk|canada|germany|france|australia)\))\b",
+]
+
+
 def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
     inc = cfg.get("include_titles") or [r"."]
     exc = cfg.get("exclude_titles") or []
@@ -50,6 +57,10 @@ def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
         if locs:
             hay = f"{j.location} {j.title}".lower()
             is_remote = allow_remote and any(h in hay for h in REMOTE_HINTS)
+            if is_remote and any(re.search(p, hay, re.I) for p in RESTRICTED_NON_INDIA_PATTERNS):
+                if not any(l in hay for l in locs) and not any(g in hay for g in ("worldwide", "global", "anywhere", "apac", "all locations")):
+                    is_remote = False
+
             if not is_remote and not any(l in hay for l in locs):
                 stats["location"] += 1
                 continue
