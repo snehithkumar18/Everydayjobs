@@ -10,7 +10,10 @@ from datetime import datetime, timedelta, timezone
 
 from .fetch import Job
 
-REMOTE_HINTS = ("remote", "anywhere", "work from home", "wfh", "distributed")
+REMOTE_HINTS = (
+    "remote", "anywhere", "work from home", "wfh", "distributed",
+    "worldwide", "global", "telecommute", "virtual", "work from anywhere",
+)
 
 
 def _any_match(patterns: list[str], text: str) -> bool:

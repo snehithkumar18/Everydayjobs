@@ -52,13 +52,65 @@ filters:
     - '\b(ios|android|mobile|game)\b' # wrong discipline
 
   # Substrings matched against "<location> <title>", case-insensitive.
-  # Leave empty to accept every location.
+  # If allow_remote is true, all remote roles across the world automatically pass.
   locations:
-    - bangalore
+    # --- Top Priority Tech Hubs ---
     - bengaluru
+    - bangalore
+    - hyderabad
+    - mumbai
+    - pune
+    - gurgaon
+    - gurugram
+    - noida
+    - delhi
+    - new delhi
+    - ncr
+    - chennai
+    - kolkata
+    - ahmedabad
+
+    # --- All States & Major Tech Cities across India ---
+    - karnataka
+    - telangana
+    - maharashtra
+    - tamil nadu
+    - haryana
+    - uttar pradesh
+    - west bengal
+    - gujarat
+    - kerala
+    - andhra pradesh
+    - rajasthan
+    - punjab
+    - odisha
+    - madhya pradesh
+    - chandigarh
+    - kochi
+    - cochin
+    - trivandrum
+    - thiruvananthapuram
+    - indore
+    - jaipur
+    - coimbatore
+    - bhubaneswar
+    - visakhapatnam
+    - vizag
+    - mysore
+    - mysuru
+    - nagpur
+    - vadodara
+    - surat
+    - lucknow
+    - kanpur
+    - patna
+    - bhopal
+    - goa
+    - dehradun
+    - guwahati
     - india
 
-  # If true, anything reading as remote passes the location gate.
+  # If true, anything reading as remote (worldwide) passes the location gate.
   allow_remote: true
 
   # Drop postings older than this. Set to null to disable.
