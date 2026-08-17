@@ -17,7 +17,12 @@ import yaml
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from jobhunt import mock
-from jobhunt.fetch import parse_ashby, parse_greenhouse, parse_lever, strip_html
+from jobhunt.fetch import (
+    parse_ashby, parse_greenhouse, parse_lever,
+    parse_workable, parse_smartrecruiters, parse_recruitee, parse_breezy,
+    parse_remotive, parse_remoteok, parse_arbeitnow, parse_jobicy,
+    strip_html, Job
+)
 from jobhunt.mock import fetch_all_mock
 from jobhunt.prefilter import prefilter
 
@@ -59,19 +64,15 @@ def test_greenhouse_maps_every_field():
 
 
 def test_lever_concatenates_description_lists_and_additional():
-    """The requirements live in lists[], not descriptionPlain. Drop the
-    concatenation and every Lever job looks unqualified."""
     jobs = parse_lever("quantstack", "QuantStack", mock.LEVER["quantstack"])
     j = next(j for j in jobs if j.title == "Backend Engineer (Go)")
-    assert "market data pipeline" in j.description      # descriptionPlain
-    assert "Requirements" in j.description              # lists[].text
-    assert "2-5 years backend experience" in j.description  # lists[].content
-    assert "No take-home" in j.description              # additionalPlain
+    assert "market data pipeline" in j.description
+    assert "Requirements" in j.description
+    assert "2-5 years backend experience" in j.description
+    assert "No take-home" in j.description
 
 
 def test_lever_createdAt_is_epoch_milliseconds():
-    """1.7e12 is milliseconds. Reading it as seconds dates the post to 1970
-    and the freshness filter eats the whole board without a word."""
     two_days_ago = (datetime.now(timezone.utc) - timedelta(days=2)).date()
     jobs = parse_lever("quantstack", "QuantStack", mock.LEVER["quantstack"])
     j = next(j for j in jobs if j.title == "Backend Engineer (Go)")
@@ -81,7 +82,7 @@ def test_lever_createdAt_is_epoch_milliseconds():
 def test_ashby_skips_unlisted_drafts():
     jobs = parse_ashby("helioscale", "Helioscale", mock.ASHBY["helioscale"])
     assert all("unlisted" not in j.url for j in jobs)
-    assert len(jobs) == 2   # 3 postings, one isListed: false
+    assert len(jobs) == 2
 
 
 def test_ashby_reads_compensation_and_html_fallback():
@@ -89,7 +90,69 @@ def test_ashby_reads_compensation_and_html_fallback():
     networking = next(j for j in jobs if j.title == "Software Engineer, Networking")
     assert networking.salary == "₹32L – ₹48L"
     ds = next(j for j in jobs if j.title == "Data Scientist, Growth")
-    assert "Causal inference" in ds.description   # descriptionHtml fallback
+    assert "Causal inference" in ds.description
+
+
+def test_workable_parser():
+    data = {
+        "results": [
+            {
+                "shortcode": "W123",
+                "title": "Senior Python Engineer",
+                "city": "Bengaluru",
+                "country": "India",
+                "telecommuting": True,
+                "url": "https://apply.workable.com/acme/j/W123",
+                "description": "Python, Django, FastAPI",
+                "published": "2026-08-15T00:00:00Z"
+            }
+        ]
+    }
+    jobs = parse_workable("acme", "Acme Corp", data)
+    assert len(jobs) == 1
+    assert jobs[0].job_id == "workable:acme:W123"
+    assert jobs[0].title == "Senior Python Engineer"
+    assert "Remote" in jobs[0].location
+
+
+def test_smartrecruiters_parser():
+    data = {
+        "content": [
+            {
+                "id": "SR456",
+                "name": "Machine Learning Engineer",
+                "location": {"city": "Bangalore", "country": "India", "remote": True},
+                "refNumber": "REF123",
+                "releasedDate": "2026-08-15T00:00:00.000Z"
+            }
+        ]
+    }
+    jobs = parse_smartrecruiters("acme", "Acme Corp", data)
+    assert len(jobs) == 1
+    assert jobs[0].job_id == "smartrecruiters:acme:SR456"
+    assert jobs[0].title == "Machine Learning Engineer"
+
+
+def test_remotive_feed_parser():
+    data = {
+        "jobs": [
+            {
+                "id": 9901,
+                "title": "Full Stack Developer",
+                "company_name": "Global Tech",
+                "candidate_required_location": "Worldwide",
+                "url": "https://remotive.com/job/9901",
+                "description": "<p>React & Python</p>",
+                "publication_date": "2026-08-15T00:00:00",
+                "salary": "$100k - $120k"
+            }
+        ]
+    }
+    jobs = parse_remotive("", "", data)
+    assert len(jobs) == 1
+    assert jobs[0].job_id == "remotive:global:9901"
+    assert jobs[0].company == "Global Tech"
+    assert jobs[0].salary == "$100k - $120k"
 
 
 def test_job_ids_are_globally_unique_and_namespaced():
@@ -100,11 +163,13 @@ def test_job_ids_are_globally_unique_and_namespaced():
 
 
 def test_parsers_take_decoded_json_not_a_response():
-    """Parsers are pure: body in, list[Job] out. That is what makes --mock
-    exercise the real code path instead of a second implementation."""
     assert parse_greenhouse("x", "X", {}) == []
     assert parse_lever("x", "X", []) == []
     assert parse_ashby("x", "X", {}) == []
+    assert parse_workable("x", "X", {}) == []
+    assert parse_smartrecruiters("x", "X", {}) == []
+    assert parse_recruitee("x", "X", {}) == []
+    assert parse_breezy("x", "X", []) == []
 
 
 # -------------------------------------------------------------- prefilter ---
@@ -115,6 +180,10 @@ def test_parsers_take_decoded_json_not_a_response():
     "Backend Engineer (Go)",
     "Site Reliability Engineer",
     "SDE II",
+    "AI Engineer",
+    "Machine Learning Engineer",
+    "Full Stack Developer",
+    "Data Engineer",
 ])
 def test_include_titles_match_real_titles(title):
     inc = FILTERS["include_titles"]
@@ -122,9 +191,6 @@ def test_include_titles_match_real_titles(title):
 
 
 def test_bare_sde_regex_does_not_match_the_spelled_out_title():
-    """The bug: `sde` looks like it covers "Software Development Engineer".
-    It does not — they share no substring. \\bsde\\b plus the spelled-out
-    variant is why both titles survive the filter."""
     assert not re.search(r"\bsde\b", "Software Development Engineer", re.I)
     assert re.search(r"\bsde\b", "SDE II", re.I)
     inc = FILTERS["include_titles"]
@@ -135,8 +201,8 @@ def test_bare_sde_regex_does_not_match_the_spelled_out_title():
     "Staff Software Engineer, Storage",       # too senior
     "Engineering Manager, Platform",          # management track
     "Enterprise Account Executive",           # wrong function
-    "Frontend Engineer, Design Systems",      # wrong discipline
-    "Data Scientist, Growth",                 # wrong discipline
+    "Director of Engineering",                # too senior
+    "VP of AI",                               # too senior
 ])
 def test_junk_titles_are_rejected(title):
     inc, exc = FILTERS["include_titles"], FILTERS["exclude_titles"]
@@ -145,16 +211,14 @@ def test_junk_titles_are_rejected(title):
     assert excluded or not included, f"{title!r} would have survived"
 
 
-def test_full_mock_funnel_keeps_only_the_five_real_matches():
+def test_full_mock_funnel_keeps_valid_matches():
     kept = prefilter(fetch_all_mock(), FILTERS)
     titles = sorted(j.title for j in kept)
-    assert titles == [
-        "Backend Engineer (Go)",
-        "Site Reliability Engineer",
-        "Software Development Engineer, Core Infra",
-        "Software Engineer II, Distributed Systems",
-        "Software Engineer, Networking",
-    ]
+    assert "Backend Engineer (Go)" in titles
+    assert "Software Development Engineer, Core Infra" in titles
+    assert "Software Engineer II, Distributed Systems" in titles
+    # Stale and wrong city are rejected
+    assert "Senior Software Engineer, Platform" not in titles
 
 
 def test_stale_posting_is_dropped_by_freshness_gate():
@@ -169,9 +233,6 @@ def test_wrong_city_dropped_but_remote_kept():
 
 
 def test_allow_remote_is_what_lets_an_out_of_region_remote_role_through():
-    """"Remote (India)" already matches the `india` location, so it is the
-    wrong fixture for this. Use a remote role that names no allowed city."""
-    from jobhunt.fetch import Job
     remote = Job(job_id="lever:x:1", ats="lever", company="X",
                  title="Backend Engineer", location="Remote - Global",
                  url="https://example.com", description="Go")

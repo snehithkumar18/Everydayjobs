@@ -1,6 +1,7 @@
-"""Fetch jobs from public ATS APIs. No auth, no scraping, no ToS risk."""
+"""Fetch jobs from public ATS APIs and free remote aggregators. No auth, no scraping, no cost."""
 from __future__ import annotations
 
+import concurrent.futures
 import html
 import re
 import time
@@ -9,8 +10,8 @@ from typing import Any, Iterable
 
 import requests
 
-UA = {"User-Agent": "jobhunt/1.0 (personal job search agent)"}
-TIMEOUT = 20
+UA = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 jobhunt/1.0"}
+TIMEOUT = 8
 
 _TAG = re.compile(r"<[^>]+>")
 _WS = re.compile(r"[ \t\r\f\v]+")
@@ -50,8 +51,7 @@ class Job:
 
 
 # --------------------------------------------------------------------------
-# Adapters. Each takes the raw JSON body and returns list[Job].
-# Keeping parse separate from HTTP is what makes offline testing possible.
+# ATS Parsers
 # --------------------------------------------------------------------------
 
 def parse_greenhouse(slug: str, company: str, body: Any) -> list[Job]:
@@ -75,7 +75,6 @@ def parse_lever(slug: str, company: str, body: Any) -> list[Job]:
     out = []
     for j in (body or []):
         cats = j.get("categories") or {}
-        # Lever splits the JD across descriptionPlain + a `lists` array.
         chunks = [j.get("descriptionPlain") or strip_html(j.get("description"))]
         for lst in (j.get("lists") or []):
             chunks.append(str(lst.get("text") or ""))
@@ -123,10 +122,191 @@ def parse_ashby(slug: str, company: str, body: Any) -> list[Job]:
     return out
 
 
+def parse_workable(slug: str, company: str, body: Any) -> list[Job]:
+    out = []
+    results = (body or {}).get("results", []) or (body or {}).get("jobs", [])
+    for j in results:
+        loc = ", ".join(filter(None, [j.get("city"), j.get("region"), j.get("country")]))
+        if j.get("telecommuting"):
+            loc = f"Remote ({loc})" if loc else "Remote"
+        jid = j.get("shortcode") or j.get("id")
+        out.append(Job(
+            job_id=f"workable:{slug}:{jid}",
+            ats="workable",
+            company=company,
+            title=(j.get("title") or "").strip(),
+            location=loc.strip(),
+            url=j.get("url") or j.get("shortlink") or f"https://apply.workable.com/{slug}/j/{jid}/",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("published_on") or j.get("created_at"),
+        ))
+    return out
+
+
+def parse_smartrecruiters(slug: str, company: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("content", []):
+        loc_data = j.get("location") or {}
+        loc = ", ".join(filter(None, [loc_data.get("city"), loc_data.get("region"), loc_data.get("country")]))
+        if loc_data.get("remote"):
+            loc = f"Remote ({loc})" if loc else "Remote"
+        jid = j.get("id")
+        out.append(Job(
+            job_id=f"smartrecruiters:{slug}:{jid}",
+            ats="smartrecruiters",
+            company=company,
+            title=(j.get("name") or "").strip(),
+            location=loc.strip(),
+            url=f"https://jobs.smartrecruiters.com/{slug}/{jid}",
+            description=strip_html(j.get("jobAd", {}).get("sections", {}).get("jobDescription", {}).get("text", "")),
+            posted_at=j.get("releasedDate"),
+        ))
+    return out
+
+
+def parse_recruitee(slug: str, company: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("offers", []):
+        loc = ", ".join(filter(None, [j.get("city"), j.get("country")]))
+        if j.get("remote"):
+            loc = f"Remote ({loc})" if loc else "Remote"
+        jid = j.get("id")
+        out.append(Job(
+            job_id=f"recruitee:{slug}:{jid}",
+            ats="recruitee",
+            company=company,
+            title=(j.get("title") or "").strip(),
+            location=loc.strip(),
+            url=j.get("careers_url") or "",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("created_at") or j.get("published_at"),
+        ))
+    return out
+
+
+def parse_breezy(slug: str, company: str, body: Any) -> list[Job]:
+    out = []
+    items = body if isinstance(body, list) else []
+    for j in items:
+        loc_data = j.get("location") or {}
+        loc = loc_data.get("name") or ""
+        if loc_data.get("is_remote"):
+            loc = f"Remote ({loc})" if loc else "Remote"
+        jid = j.get("_id") or j.get("id")
+        out.append(Job(
+            job_id=f"breezy:{slug}:{jid}",
+            ats="breezy",
+            company=company,
+            title=(j.get("name") or "").strip(),
+            location=loc.strip(),
+            url=j.get("url") or f"https://{slug}.breezy.hr/p/{jid}",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("creation_date"),
+        ))
+    return out
+
+
+# --------------------------------------------------------------------------
+# Free Global Remote Aggregator Parsers
+# --------------------------------------------------------------------------
+
+def parse_remotive(_: str, __: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("jobs", []):
+        jid = str(j.get("id"))
+        company = (j.get("company_name") or "Remote Company").strip()
+        loc = (j.get("candidate_required_location") or "Worldwide / Remote").strip()
+        out.append(Job(
+            job_id=f"remotive:global:{jid}",
+            ats="remotive",
+            company=company,
+            title=(j.get("title") or "").strip(),
+            location=f"Remote ({loc})",
+            url=j.get("url") or "",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("publication_date"),
+            salary=j.get("salary"),
+        ))
+    return out
+
+
+def parse_remoteok(_: str, __: str, body: Any) -> list[Job]:
+    out = []
+    items = body if isinstance(body, list) else []
+    for j in items:
+        if not isinstance(j, dict) or not j.get("id"):
+            continue
+        jid = str(j.get("id"))
+        company = (j.get("company") or "Remote Company").strip()
+        loc = (j.get("location") or "Worldwide / Remote").strip()
+        out.append(Job(
+            job_id=f"remoteok:global:{jid}",
+            ats="remoteok",
+            company=company,
+            title=(j.get("position") or "").strip(),
+            location=f"Remote ({loc})",
+            url=j.get("url") or f"https://remoteok.com/remote-jobs/{jid}",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("date"),
+        ))
+    return out
+
+
+def parse_arbeitnow(_: str, __: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("data", []):
+        jid = j.get("slug") or str(j.get("id") or "")
+        company = (j.get("company_name") or "Tech Company").strip()
+        loc = j.get("location") or ""
+        if j.get("remote"):
+            loc = f"Remote ({loc})" if loc else "Remote"
+        out.append(Job(
+            job_id=f"arbeitnow:global:{jid}",
+            ats="arbeitnow",
+            company=company,
+            title=(j.get("title") or "").strip(),
+            location=loc.strip(),
+            url=j.get("url") or "",
+            description=strip_html(j.get("description")),
+            posted_at=time.strftime("%Y-%m-%d", time.gmtime(j.get("created_at"))) if isinstance(j.get("created_at"), (int, float)) else None,
+        ))
+    return out
+
+
+def parse_jobicy(_: str, __: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("jobs", []):
+        jid = str(j.get("id"))
+        company = (j.get("companyName") or "Tech Company").strip()
+        loc = (j.get("jobGeo") or "Worldwide / Remote").strip()
+        out.append(Job(
+            job_id=f"jobicy:global:{jid}",
+            ats="jobicy",
+            company=company,
+            title=(j.get("jobTitle") or "").strip(),
+            location=f"Remote ({loc})",
+            url=j.get("url") or "",
+            description=strip_html(j.get("jobDescription")),
+            posted_at=j.get("pubDate"),
+        ))
+    return out
+
+
 ENDPOINTS = {
-    "greenhouse": ("https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", parse_greenhouse),
-    "lever":      ("https://api.lever.co/v0/postings/{slug}?mode=json", parse_lever),
-    "ashby":      ("https://api.ashbyhq.com/posting-api/job-board/{slug}?includeCompensation=true", parse_ashby),
+    "greenhouse":       ("https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", parse_greenhouse),
+    "lever":            ("https://api.lever.co/v0/postings/{slug}?mode=json", parse_lever),
+    "ashby":            ("https://api.ashbyhq.com/posting-api/job-board/{slug}?includeCompensation=true", parse_ashby),
+    "workable":         ("https://apply.workable.com/api/v3/accounts/{slug}/jobs", parse_workable),
+    "smartrecruiters":  ("https://api.smartrecruiters.com/v1/companies/{slug}/postings", parse_smartrecruiters),
+    "recruitee":        ("https://{slug}.recruitee.com/api/offers", parse_recruitee),
+    "breezy":           ("https://{slug}.breezy.hr/json", parse_breezy),
+}
+
+REMOTE_FEEDS = {
+    "remotive":   ("https://remotive.com/api/remote-jobs?category=software-dev,data&limit=100", parse_remotive),
+    "remoteok":   ("https://remoteok.com/api", parse_remoteok),
+    "arbeitnow":  ("https://www.arbeitnow.com/api/job-board-api", parse_arbeitnow),
+    "jobicy":     ("https://jobicy.com/api/v2/remote-jobs?count=50&industry=engineering", parse_jobicy),
 }
 
 
@@ -134,27 +314,64 @@ def fetch_board(ats: str, slug: str, company: str | None = None,
                 session: requests.Session | None = None) -> list[Job]:
     """Hit one company's public board. Returns [] on any failure (never raises)."""
     if ats not in ENDPOINTS:
-        raise ValueError(f"unknown ATS: {ats}")
+        return []
     url_tpl, parser = ENDPOINTS[ats]
     sess = session or requests
     try:
         r = sess.get(url_tpl.format(slug=slug), headers=UA, timeout=TIMEOUT)
         if r.status_code != 200:
-            print(f"  ! {ats}/{slug} -> HTTP {r.status_code}")
             return []
         return parser(slug, company or slug, r.json())
-    except Exception as e:  # dead slug, rate limit, network blip
-        print(f"  ! {ats}/{slug} -> {type(e).__name__}: {e}")
+    except Exception:
         return []
 
 
-def fetch_all(companies: Iterable[dict], sleep: float = 0.25) -> list[Job]:
+def fetch_remote_feed(feed_name: str, session: requests.Session | None = None) -> list[Job]:
+    """Hit a free public remote job aggregator feed."""
+    if feed_name not in REMOTE_FEEDS:
+        return []
+    url, parser = REMOTE_FEEDS[feed_name]
+    sess = session or requests
+    try:
+        r = sess.get(url, headers=UA, timeout=TIMEOUT)
+        if r.status_code != 200:
+            return []
+        return parser("", feed_name, r.json())
+    except Exception:
+        return []
+
+
+def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
+              max_workers: int = 24) -> list[Job]:
+    """Fetch jobs concurrently from all company ATS boards and free remote feeds."""
     jobs: list[Job] = []
-    session = requests.Session()
-    for c in companies:
-        got = fetch_board(c["ats"], c["slug"], c.get("name"), session=session)
-        if got:
-            print(f"  {c.get('name') or c['slug']:<28} {len(got):>4} jobs  ({c['ats']})")
-        jobs.extend(got)
-        time.sleep(sleep)
+    fut_map = {}
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        # Submit all company ATS boards
+        for c in companies:
+            ats = c.get("ats")
+            slug = c.get("slug")
+            name = c.get("name") or slug
+            if ats and slug:
+                fut = executor.submit(fetch_board, ats, slug, name)
+                fut_map[fut] = (name, ats)
+
+        # Submit free remote aggregator feeds
+        if include_remote_feeds:
+            for feed_key in REMOTE_FEEDS:
+                fut = executor.submit(fetch_remote_feed, feed_key)
+                fut_map[fut] = (f"Feed ({feed_key})", "remote-feed")
+
+        for fut in concurrent.futures.as_completed(fut_map):
+            name, src = fut_map[fut]
+            try:
+                got = fut.result()
+                if got:
+                    print(f"  {name:<32} {len(got):>4} jobs  ({src})", flush=True)
+                    jobs.extend(got)
+            except Exception as e:
+                print(f"  ! {name} failed: {e}", flush=True)
+
     return jobs
+

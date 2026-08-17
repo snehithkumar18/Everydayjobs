@@ -103,7 +103,8 @@ def cmd_run(args) -> int:
         if not companies:
             print("companies.yaml has no entries")
             return 1
-        jobs = fetch_all(companies)
+        include_remote = bool(cfg.get("include_remote_feeds", True))
+        jobs = fetch_all(companies, include_remote_feeds=include_remote)
     scanned = len(jobs)
     if not scanned:
         print("no postings fetched — check the slugs in companies.yaml")
