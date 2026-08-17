@@ -69,8 +69,8 @@ filters:
 screen_batch_size: 8      # jobs per screening call. Higher = cheaper, sloppier.
 screen_jd_chars: 1400     # JD truncation for screening
 draft_jd_chars: 6000      # JD truncation for drafting
-score_threshold: 7.0      # below this, no draft and no digest slot
-max_per_digest: 5         # hard cap on expensive draft calls per run
+score_threshold: 6.5      # below this, no draft and no digest slot
+max_per_digest: 20        # up to 20 matched jobs per digest
 
 # --- paths ------------------------------------------------------------------
 companies_file: companies.yaml
