@@ -2,10 +2,8 @@ name: daily job digest
 
 on:
   schedule:
-    # 06:00 IST, weekdays. IST is UTC+5:30, so 06:00 IST == 00:30 UTC.
-    # GitHub's scheduler is best-effort and can lag by several minutes under
-    # load — that is fine for a job digest, do not tighten it.
-    - cron: "30 0 * * 1-5"
+    # 06:00 IST & 18:00 IST every day. IST is UTC+5:30 -> 00:30 UTC and 12:30 UTC
+    - cron: "30 0,12 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -52,34 +50,35 @@ jobs:
 
       - name: Write profile.json
         # profile.json is gitignored (it is derived from your resume), so CI
-        # gets it from a secret. Create it locally with
-        #   python -m jobhunt profile --resume resume.pdf
-        # then paste the file contents into the PROFILE_JSON repo secret.
+        # gets it from a secret or falls back to profile.example.json.
         env:
           PROFILE_JSON: ${{ secrets.PROFILE_JSON }}
         run: |
-          if [ -z "$PROFILE_JSON" ]; then
-            echo "::error::PROFILE_JSON secret is empty — see the README"
+          if [ -n "$PROFILE_JSON" ]; then
+            printf '%s' "$PROFILE_JSON" > profile.json
+          elif [ -f profile.example.json ]; then
+            cp profile.example.json profile.json
+          else
+            echo "::error::No profile found — see the README"
             exit 1
           fi
-          printf '%s' "$PROFILE_JSON" > profile.json
           python -c "import json;json.load(open('profile.json'));print('profile.json parsed OK')"
 
       - name: Run the pipeline
         env:
-          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'anthropic' }}
-          SCREEN_PROVIDER: ${{ vars.SCREEN_PROVIDER }}
-          DRAFT_PROVIDER: ${{ vars.DRAFT_PROVIDER }}
-          SCREEN_MODEL: ${{ vars.SCREEN_MODEL }}
-          DRAFT_MODEL: ${{ vars.DRAFT_MODEL }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'gemini' }}
+          SCREEN_PROVIDER: ${{ vars.SCREEN_PROVIDER || 'gemini' }}
+          DRAFT_PROVIDER: ${{ vars.DRAFT_PROVIDER || 'gemini' }}
+          SCREEN_MODEL: ${{ vars.SCREEN_MODEL || 'gemini-2.5-flash' }}
+          DRAFT_MODEL: ${{ vars.DRAFT_MODEL || 'gemini-2.5-flash' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST || 'smtp.gmail.com' }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT || '587' }}
+          SMTP_USER: ${{ secrets.SMTP_USER || 'snehithetsy@gmail.com' }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
-          MAIL_TO: ${{ secrets.MAIL_TO }}
+          MAIL_TO: ${{ secrets.MAIL_TO || 'snehithetsy@gmail.com' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python -m jobhunt run
