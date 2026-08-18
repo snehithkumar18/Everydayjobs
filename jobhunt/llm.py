@@ -68,7 +68,7 @@ def parse_json(raw: str) -> Any:
             except json.JSONDecodeError:
                 continue
         if objects:
-            return objects
+            return objects if "[" in cleaned else objects[0]
 
     raise ValueError(f"could not parse JSON from model reply: {cleaned[:300]!r}")
 
