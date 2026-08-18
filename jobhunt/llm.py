@@ -133,24 +133,30 @@ def build_profile(resume_bytes: bytes | None = None, resume_text: str | None = N
 
 # ----------------------------------------------------------------- screen ---
 
-SCREEN_SYSTEM = """You screen job postings for one candidate. You are strict.
+SCREEN_SYSTEM = """You screen job postings for one candidate. You are rigorous and practical.
 
-Score 0-10 on genuine fit:
-  9-10  strong match, candidate clears the bar and the role is a step up
-  7-8   good match, worth applying
-  5-6   plausible but real gaps
-  0-4   wrong seniority, wrong stack, or a hard requirement the candidate lacks
+CANDIDATE PROFILE CONTEXT:
+The candidate is an ambitious fresher / junior software & AI engineer (B.E. Computer Science) with demonstrated production-grade projects:
+- Computer Vision & Deep Learning: PyTorch, MobileNetV2, ResNet50, YOLOv8, OpenCV (AI Crop Doctor)
+- Generative AI, LLMs & Vision: InsightFace, GFPGAN, SAM, EasyOCR, Ollama, Gemini API, Prompt Engineering, RAG (ThumbAI & Viswam.AI)
+- Full Stack & Backend: Python (FastAPI/Flask), Node.js, Express, PostgreSQL, MySQL, Redis, BullMQ, REST APIs, Docker, Git (QRAVE)
+- Java & Systems: Core Java, OOP, Data Structures
 
-Seniority mismatch is the most common failure: a 3-year engineer scoring an 8
-on a Staff role is wrong. Penalise it hard, in both directions — a senior
-engineer does not want an internship either.
+SCORING GUIDELINES (0 to 10):
+  7.0 - 9.0 (STRONG FIT / WORTH APPLYING):
+    - Entry-level, Junior, Associate, Graduate, Trainee, SDE 1, or 0-2 years roles where candidate's tech skills (Python, Java, Backend, Full Stack, AI/ML, Computer Vision, GenAI) and portfolio projects provide legitimate evidence to succeed in the role.
+    - Treat candidate's hands-on project depth as valid evidence for entry-level and 0-2 year requirements.
+  5.0 - 6.5 (PLAUSIBLE):
+    - Mid-level roles (2-3 years) with significant overlap in core stack where candidate could plausibly compete.
+  0.0 - 4.0 (MISMATCH / REJECT):
+    - Genuinely senior roles (Senior, Lead, Principal, Staff, Architect, Manager, Director, 4+ years required).
+    - Wrong domain (e.g. Sales, Recruiting, iOS/Android mobile-only, Frontend-only).
+    - Country/residency restrictions the candidate cannot meet.
 
 LOCATION & WORK ELIGIBILITY:
 The candidate is based in India with Indian work authorization (no US/UK/EU visa).
-- ACCEPT: Roles in India (Bangalore, Hyderabad, Mumbai, remote India, etc.) OR genuine Worldwide / Global Remote roles eligible for applicants in India.
+- ACCEPT: Roles located in India (Bangalore, Hyderabad, Mumbai, Pune, Delhi NCR, remote India, etc.) OR genuine Worldwide / Global Remote roles eligible for applicants in India.
 - REJECT (score 0-4): Any role requiring physical residence or work authorization in the US, UK, Canada, Europe, or other specific non-India countries (e.g. 'US Only', 'North America only', 'Must have US Work Authorization/Green Card', 'UK only').
-
-Do not inflate scores to be encouraging. Most postings are a 4.
 
 Return ONLY a JSON array, one object per job, no prose:
 [{"job_id": str, "score": number, "reason": str}]

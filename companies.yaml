@@ -27,132 +27,73 @@ companies:
   - {ats: greenhouse, slug: databricks,        name: Databricks}
   - {ats: ashby,      slug: openai,            name: OpenAI}
   - {ats: greenhouse, slug: anthropic,         name: Anthropic}
-  - {ats: greenhouse, slug: scale-ai,          name: Scale AI}
-  - {ats: greenhouse, slug: huggingface,       name: Hugging Face}
+  - {ats: ashby,      slug: cognition,         name: Cognition AI}
+  - {ats: ashby,      slug: anyscale,          name: Anyscale}
+  - {ats: ashby,      slug: pinecone,          name: Pinecone}
+  - {ats: ashby,      slug: deepgram,          name: Deepgram}
   - {ats: ashby,      slug: cohere,            name: Cohere}
   - {ats: ashby,      slug: perplexity,        name: Perplexity AI}
-  - {ats: ashby,      slug: togetherai,        name: Together AI}
   - {ats: ashby,      slug: langchain,         name: LangChain}
-  - {ats: greenhouse, slug: runwayml,          name: Runway}
-  - {ats: ashby,      slug: stabilityai,       name: Stability AI}
   - {ats: ashby,      slug: elevenlabs,        name: ElevenLabs}
-  - {ats: greenhouse, slug: jasper,            name: Jasper AI}
-  - {ats: greenhouse, slug: deepgram,          name: Deepgram}
   - {ats: ashby,      slug: synthesia,         name: Synthesia}
-  - {ats: ashby,      slug: glean,             name: Glean}
-  - {ats: greenhouse, slug: pinecone,          name: Pinecone}
-  - {ats: greenhouse, slug: wandb,             name: Weights & Biases}
   - {ats: ashby,      slug: modal,             name: Modal}
-  - {ats: ashby,      slug: fireworks-ai,      name: Fireworks AI}
-  - {ats: ashby,      slug: character-ai,      name: Character.AI}
-  - {ats: greenhouse, slug: groq,              name: Groq}
-  - {ats: greenhouse, slug: replicate,         name: Replicate}
-  - {ats: ashby,      slug: decart,            name: Decart}
+  - {ats: ashby,      slug: cursor,            name: Cursor}
+  - {ats: ashby,      slug: replit,            name: Replit}
 
   # --- Cloud, DevTools & Infrastructure ---
   - {ats: greenhouse, slug: stripe,            name: Stripe}
   - {ats: greenhouse, slug: figma,             name: Figma}
-  - {ats: greenhouse, slug: github,            name: GitHub}
   - {ats: greenhouse, slug: gitlab,            name: GitLab}
   - {ats: greenhouse, slug: datadog,           name: Datadog}
-  - {ats: greenhouse, slug: snowflake,         name: Snowflake}
   - {ats: greenhouse, slug: mongodb,           name: MongoDB}
   - {ats: greenhouse, slug: cloudflare,        name: Cloudflare}
   - {ats: greenhouse, slug: elastic,           name: Elastic}
-  - {ats: greenhouse, slug: hashicorp,         name: HashiCorp}
   - {ats: greenhouse, slug: vercel,            name: Vercel}
   - {ats: ashby,      slug: supabase,          name: Supabase}
   - {ats: greenhouse, slug: postman,           name: Postman}
-  - {ats: greenhouse, slug: hasura,            name: Hasura}
-  - {ats: greenhouse, slug: browserstack,      name: BrowserStack}
-  - {ats: greenhouse, slug: digitalocean,      name: DigitalOcean}
-  - {ats: greenhouse, slug: sentry,            name: Sentry}
-  - {ats: greenhouse, slug: redis,             name: Redis}
-  - {ats: greenhouse, slug: docker,            name: Docker}
-  - {ats: greenhouse, slug: grafana,           name: Grafana Labs}
-  - {ats: greenhouse, slug: kong,              name: Kong}
+  - {ats: greenhouse, slug: hackerrank,        name: HackerRank}
   - {ats: greenhouse, slug: launchdarkly,      name: LaunchDarkly}
   - {ats: greenhouse, slug: cockroachlabs,     name: Cockroach Labs}
-  - {ats: greenhouse, slug: confluent,         name: Confluent}
   - {ats: greenhouse, slug: clickhouse,        name: ClickHouse}
   - {ats: ashby,      slug: temporal,          name: Temporal}
   - {ats: ashby,      slug: neon,              name: Neon}
-  - {ats: greenhouse, slug: sourcegraph,       name: Sourcegraph}
-  - {ats: greenhouse, slug: dbt-labs,          name: dbt Labs}
-  - {ats: greenhouse, slug: astronomer,        name: Astronomer (Airflow)}
   - {ats: greenhouse, slug: starburst,         name: Starburst (Trino)}
 
   # --- Product, SaaS & Consumer Tech ---
   - {ats: ashby,      slug: linear,            name: Linear}
   - {ats: ashby,      slug: ramp,              name: Ramp}
-  - {ats: ashby,      slug: brex,              name: Brex}
   - {ats: ashby,      slug: notion,            name: Notion}
   - {ats: greenhouse, slug: discord,           name: Discord}
   - {ats: greenhouse, slug: airtable,          name: Airtable}
-  - {ats: greenhouse, slug: miro,              name: Miro}
-  - {ats: greenhouse, slug: canva,             name: Canva}
   - {ats: greenhouse, slug: reddit,            name: Reddit}
   - {ats: greenhouse, slug: pinterest,         name: Pinterest}
-  - {ats: greenhouse, slug: spotify,           name: Spotify}
   - {ats: greenhouse, slug: dropbox,           name: Dropbox}
   - {ats: greenhouse, slug: asana,             name: Asana}
-  - {ats: greenhouse, slug: box,               name: Box}
   - {ats: greenhouse, slug: intercom,          name: Intercom}
-  - {ats: greenhouse, slug: zapier,            name: Zapier}
-  - {ats: greenhouse, slug: retool,            name: Retool}
   - {ats: greenhouse, slug: webflow,           name: Webflow}
-  - {ats: greenhouse, slug: loom,              name: Loom}
   - {ats: ashby,      slug: vanta,             name: Vanta}
-  - {ats: ashby,      slug: cursor,            name: Cursor (Anysphere)}
-  - {ats: ashby,      slug: loom,              name: Loom (Atlassian)}
-  - {ats: ashby,      slug: replit,            name: Replit}
-  - {ats: greenhouse, slug: plaid,             name: Plaid}
   - {ats: greenhouse, slug: gusto,             name: Gusto}
   - {ats: greenhouse, slug: affirm,            name: Affirm}
   - {ats: greenhouse, slug: chime,             name: Chime}
   - {ats: greenhouse, slug: wise,              name: Wise}
-  - {ats: greenhouse, slug: revolut,           name: Revolut}
-  - {ats: greenhouse, slug: klarna,            name: Klarna}
   - {ats: greenhouse, slug: coinbase,          name: Coinbase}
-  - {ats: greenhouse, slug: kraken,            name: Kraken}
   - {ats: greenhouse, slug: ripple,            name: Ripple}
   - {ats: greenhouse, slug: robinhood,         name: Robinhood}
   - {ats: greenhouse, slug: block,             name: Block (Square)}
 
   # --- India Tech Leaders, Unicorns & GCCs ---
-  - {ats: greenhouse, slug: razorpay,          name: Razorpay}
-  - {ats: greenhouse, slug: cred,              name: CRED}
-  - {ats: greenhouse, slug: swiggy,            name: Swiggy}
-  - {ats: greenhouse, slug: zomato,            name: Zomato}
-  - {ats: greenhouse, slug: meesho,            name: Meesho}
-  - {ats: greenhouse, slug: groww,             name: Groww}
-  - {ats: greenhouse, slug: zepto,             name: Zepto}
-  - {ats: greenhouse, slug: urbancompany,      name: Urban Company}
+  - {ats: lever,      slug: paytm,             name: Paytm}
+  - {ats: lever,      slug: meesho,            name: Meesho}
+  - {ats: lever,      slug: cred,              name: CRED}
+  - {ats: lever,      slug: zeta,              name: Zeta}
+  - {ats: lever,      slug: porter,            name: Porter}
   - {ats: greenhouse, slug: inmobi,            name: InMobi}
   - {ats: greenhouse, slug: phonepe,           name: PhonePe}
-  - {ats: greenhouse, slug: freshworks,        name: Freshworks}
-  - {ats: greenhouse, slug: chargebee,         name: Chargebee}
-  - {ats: greenhouse, slug: dream11,           name: Dream11}
   - {ats: greenhouse, slug: slice,             name: slice}
-  - {ats: greenhouse, slug: delhivery,         name: Delhivery}
-  - {ats: greenhouse, slug: udaan,             name: Udaan}
-  - {ats: greenhouse, slug: cars24,            name: Cars24}
-  - {ats: greenhouse, slug: clevertap,         name: CleverTap}
-  - {ats: greenhouse, slug: moengage,          name: MoEngage}
-  - {ats: greenhouse, slug: innovaccer,        name: Innovaccer}
-  - {ats: greenhouse, slug: darwinbox,         name: Darwinbox}
-  - {ats: greenhouse, slug: gupshup,           name: Gupshup}
-  - {ats: greenhouse, slug: khatabook,         name: Khatabook}
-  - {ats: greenhouse, slug: jupiter,           name: Jupiter Money}
-  - {ats: greenhouse, slug: navi,              name: Navi Technologies}
-  - {ats: greenhouse, slug: apna,              name: Apna}
-  - {ats: greenhouse, slug: unacademy,         name: Unacademy}
-  - {ats: greenhouse, slug: epifi,             name: Fi Money}
-  - {ats: greenhouse, slug: sprinkler,         name: Sprinklr}
+  - {ats: greenhouse, slug: groww,             name: Groww}
   - {ats: greenhouse, slug: tcs,               name: TCS}
   - {ats: greenhouse, slug: thoughtworks,      name: Thoughtworks}
   - {ats: greenhouse, slug: rubrik,            name: Rubrik}
-  - {ats: greenhouse, slug: nutanix,           name: Nutanix}
   - {ats: greenhouse, slug: coherehealth,      name: Cohere Health}
 
   # --- Security, Infrastructure & Enterprise ---
