@@ -42,8 +42,9 @@ filters:
     - '\b(qa\s+automation|software\s+testing|automation\s+engineer|test\s+engineer)\b'
     - '\bdata\s+scientist\b'
 
-    # MNC Entry-Level & Fresher Programs (TCS, Infosys, Wipro, etc.)
+    # MNC Entry-Level & Fresher Programs (TCS, Infosys, Wipro, Accenture, Cognizant, etc.)
     - '\b(graduate\s+engineer\s+trainee|get|trainee\s+engineer|associate\s+engineer|fresher\s+engineer|system\s+engineer\s+trainee)\b'
+    - '\b(custom\s+software\s+engineer|custom\s+engineer|systems?\s+engineer|systems?\s+developer|programmer\s+analyst(\s+trainee)?)\b'
     - '\bentry\s*level\b.*\b(engineer|developer|software)\b'
     - '\bfresher\b'
 
@@ -117,58 +118,60 @@ filters:
   # If true, anything reading as remote (worldwide) passes the location gate.
   allow_remote: true
 
-  # Drop postings older than this. Set to null to disable.
-  # Boards often re-stamp `updated_at`, so this is a soft signal, not a promise.
-  max_age_days: 30
+  # Drop postings older than 7 days (1 week maximum).
+  max_age_days: 7
 
-# --- LinkedIn Live Search ----------------------------------------------------
+# --- LinkedIn Live Search (Strict 7-Day Window) ------------------------------
 linkedin_searches:
-  # --- Software / Backend / Full Stack ---
+  # --- Software / Backend / Full Stack (Pan-India) ---
   - {query: "Python Developer", location: "India"}
-  - {query: "Python Backend Developer", location: "Bengaluru"}
-  - {query: "Python Developer", location: "Hyderabad"}
-  - {query: "Backend Developer", location: "Bengaluru"}
+  - {query: "Python Backend Developer", location: "India"}
+  - {query: "Backend Developer", location: "India"}
   - {query: "Backend Engineer", location: "India"}
-  - {query: "Backend Developer", location: "Hyderabad"}
-  - {query: "Backend Developer", location: "Pune"}
   - {query: "Full Stack Engineer", location: "India"}
-  - {query: "Full Stack Developer", location: "Bengaluru"}
-  - {query: "Full Stack Developer", location: "Hyderabad"}
-  - {query: "Software Engineer", location: "Bengaluru"}
-  - {query: "Software Engineer", location: "Hyderabad"}
-  - {query: "Software Engineer", location: "Pune"}
-  - {query: "Software Engineer", location: "Gurgaon"}
-  - {query: "Software Engineer", location: "Remote"}
+  - {query: "Full Stack Developer", location: "India"}
+  - {query: "Software Engineer", location: "India"}
+  - {query: "Software Developer", location: "India"}
+  - {query: "Software Development Engineer", location: "India"}
+  - {query: "API Developer", location: "India"}
+  - {query: "Application Developer", location: "India"}
 
-  # --- Fresher / Junior / Trainee Entry-Level ---
-  - {query: "Software Engineer Fresher", location: "India"}
+  # --- MNC & Enterprise Fresher / Trainee Roles ---
+  - {query: "Custom Software Engineer", location: "India"}
   - {query: "Associate Software Engineer", location: "India"}
+  - {query: "System Engineer", location: "India"}
+  - {query: "Systems Engineer", location: "India"}
+  - {query: "Graduate Engineer Trainee", location: "India"}
+  - {query: "Trainee Software Engineer", location: "India"}
+  - {query: "Associate Engineer", location: "India"}
+  - {query: "Programmer Analyst Trainee", location: "India"}
+  - {query: "Software Engineer Fresher", location: "India"}
   - {query: "Junior Software Engineer", location: "India"}
   - {query: "Junior Python Developer", location: "India"}
   - {query: "Junior Backend Developer", location: "India"}
-  - {query: "Graduate Engineer Trainee", location: "India"}
-  - {query: "Software Development Engineer Trainee", location: "India"}
   - {query: "SDE 1", location: "India"}
 
-  # --- Applied AI / Machine Learning / Computer Vision / GenAI ---
+  # --- Applied AI / Machine Learning / Computer Vision / GenAI (Pan-India) ---
   - {query: "AI Engineer", location: "India"}
   - {query: "Applied AI Engineer", location: "India"}
   - {query: "Generative AI Engineer", location: "India"}
+  - {query: "GenAI Engineer", location: "India"}
   - {query: "LLM Engineer", location: "India"}
   - {query: "Agentic AI Engineer", location: "India"}
   - {query: "AI Application Developer", location: "India"}
   - {query: "Machine Learning Engineer", location: "India"}
-  - {query: "Machine Learning Engineer", location: "Bengaluru"}
-  - {query: "Machine Learning Engineer", location: "Hyderabad"}
+  - {query: "Applied ML Engineer", location: "India"}
   - {query: "Computer Vision Engineer", location: "India"}
   - {query: "Vision AI Engineer", location: "India"}
   - {query: "Image Processing Engineer", location: "India"}
 
-  # --- Java & Enterprise Engineering ---
+  # --- Java & Database Engineering (Pan-India) ---
   - {query: "Java Developer", location: "India"}
-  - {query: "Java Software Engineer", location: "Bengaluru"}
+  - {query: "Java Software Engineer", location: "India"}
   - {query: "Junior Java Developer", location: "India"}
-  - {query: "Associate Java Developer", location: "India"}
+  - {query: "PostgreSQL Developer", location: "India"}
+  - {query: "SQL Developer", location: "India"}
+  - {query: "Junior Data Engineer", location: "India"}
 
 # --- LLM stages -------------------------------------------------------------
 screen_batch_size: 8      # jobs per screening call. Higher = cheaper, sloppier.

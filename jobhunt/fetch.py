@@ -341,12 +341,13 @@ def fetch_remote_feed(feed_name: str, session: requests.Session | None = None) -
         return []
 
 
-def fetch_linkedin(query: str, location: str = "India", count: int = 20) -> list[Job]:
-    """Fetch recent live jobs from LinkedIn's public guest search API."""
+def fetch_linkedin(query: str, location: str = "India", count: int = 25) -> list[Job]:
+    """Fetch recent live jobs from LinkedIn's public guest search API (past 7 days only)."""
     import urllib.parse
+    # f_TPR=r604800 restricts results to the past 1 week (604,800 seconds)
     url = (
         f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
-        f"?keywords={urllib.parse.quote(query)}&location={urllib.parse.quote(location)}&start=0"
+        f"?keywords={urllib.parse.quote(query)}&location={urllib.parse.quote(location)}&f_TPR=r604800&start=0"
     )
     out = []
     try:
@@ -362,6 +363,7 @@ def fetch_linkedin(query: str, location: str = "India", count: int = 20) -> list
                 company_m = re.search(r'<a[^>]*class="[^"]*hidden-nested-link[^"]*"[^>]*>([^<]+)</a>', card)
             loc_m = re.search(r'<span[^>]*class="[^"]*job-search-card__location[^"]*"[^>]*>([^<]+)</span>', card)
             link_m = re.search(r'<a[^>]*class="[^"]*base-card__full-link[^"]*"[^>]*href="([^"?]+)', card)
+            time_m = re.search(r'<time[^>]*datetime="([^"]+)"', card)
 
             if not title_m or not link_m:
                 continue
@@ -370,6 +372,7 @@ def fetch_linkedin(query: str, location: str = "India", count: int = 20) -> list
             raw_company = company_m.group(1).strip() if company_m else "LinkedIn Posting"
             raw_loc = loc_m.group(1).strip() if loc_m else location
             raw_url = link_m.group(1).strip()
+            posted_date = time_m.group(1).strip() if time_m else None
 
             jid_m = re.search(r'-([0-9]{8,12})(?:\?|$)', raw_url)
             jid = jid_m.group(1) if jid_m else str(abs(hash(raw_url)))
@@ -387,6 +390,7 @@ def fetch_linkedin(query: str, location: str = "India", count: int = 20) -> list
                 location=clean_loc,
                 url=raw_url,
                 description=f"{clean_title} at {clean_company} in {clean_loc}. Direct job listing on LinkedIn.",
+                posted_at=posted_date,
             ))
             if len(out) >= count:
                 break
