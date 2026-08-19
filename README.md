@@ -1,264 +1,204 @@
-# jobhunt
+# 🚀 Autonomous AI Job Hunting & Screening Engine (`Everydayjobs`)
 
-A personal job-search agent. It reads public ATS APIs every morning, throws away
-the ~99% that don't fit you, scores what's left against your resume, drafts an
-application kit for the best few, and emails you a digest.
-
-**It never submits an application.** It finds, filters, ranks and drafts. You
-read the digest, edit the cover note, and press submit yourself.
-
-```
-2000 postings  →  40 candidates  →  5 in your inbox
-   fetch          regex/location      LLM screen
-                  /freshness gate     + draft
-                  (free, no LLM)
-```
-
-> **New to Python?** Read **[SETUP.md](SETUP.md)** instead — it's a 13-step guide
-> that assumes you have nothing installed. This README assumes you're comfortable
-> with a terminal.
+An autonomous, multi-ATS job intelligence and application drafting pipeline. It monitors 100+ top company career boards and remote feeds daily, filters 9,000+ live jobs deterministically, evaluates contextual match with **Google Gemini 3.5** against your profile, drafts tailored resume bullets & cover notes, and dispatches an automated HTML email digest directly to your inbox twice a day.
 
 ---
 
-## Run it in 30 seconds, no API key
+## ⚡ Key Highlights & Architecture
+
+- **100% Free Tier Execution**: Zero infrastructure costs using **Google Gemini 3.5 Flash / Lite** + **GitHub Actions (Ubuntu Runners)** + **Gmail SMTP**.
+- **Multi-ATS Integration**: Scrapes public, direct REST endpoints from **Greenhouse**, **Lever**, **Ashby**, and global remote feeds (**Jobicy, RemoteOK, Remotive, Arbeitnow**).
+- **Cost-Zero Deterministic Pre-Filtering**: Filters out ~98% of noise (wrong seniority, non-qualifying titles, geo-restricted remote roles) before calling any LLM.
+- **Lopsided 2-Stage LLM Evaluation**:
+  - **Stage 1 (Screening)**: Evaluates batches of jobs in parallel using `gemini-3.5-flash-lite`.
+  - **Stage 2 (Drafting)**: Deeply drafts tailored resume bullets, 120-word cover notes, technical interview questions, and honest gap analyses for top-scoring roles ($\ge 6.5$) using `gemini-3.5-flash`.
+- **India Work-Eligibility Geofencing**: Automatically detects and excludes roles requiring US/EU/UK-only citizenship or residency.
+- **Fault-Tolerant Reliability**: Built-in exponential backoff on HTTP `429`/`503`, rate-pacing delays, and partial JSON streaming recovery.
+- **24/7 Hands-off Cloud Execution**: Runs on GitHub Actions twice daily (6:00 AM & 6:00 PM IST) with persistent `actions/cache` deduplication so you never see the same job twice.
+
+---
+
+## 📁 Project Structure
+
+```
+├── .github/workflows/
+│   └── daily.yml          # GitHub Actions 2x daily cloud cron schedule
+├── jobhunt/
+│   ├── cli.py             # CLI commands: run, profile, applied, stats
+│   ├── fetch.py           # Multi-threaded ATS scrapers (Greenhouse, Lever, Ashby, feeds)
+│   ├── prefilter.py       # Deterministic regex, seniority, and location filter
+│   ├── llm.py             # Two-stage screening & application kit drafting
+│   ├── providers.py       # Swappable LLM provider backends (Gemini, Claude, Groq, Ollama)
+│   ├── digest.py          # Dark-mode HTML email templating (Jinja2)
+│   ├── mailer.py          # Secure TLS/SSL SMTP email dispatcher
+│   ├── store.py           # Deduplication tracker (seen.json & tracker.csv)
+│   └── mock.py            # Local mock fixtures for offline testing
+├── tests/                 # 70 unit tests (100% pass) with Pytest
+├── config.yaml            # Search rules, title inclusion/exclusion, locations, thresholds
+├── companies.yaml         # 100+ verified tech company boards & slugs
+├── profile.example.json   # Candidate profile template (skills, projects, domains)
+├── requirements.txt       # Python dependencies
+└── README.md              # Project documentation
+```
+
+---
+
+## 🛠️ Step-by-Step Setup Guide
+
+### 1. Prerequisites
+- **Python 3.11+** installed ([python.org](https://www.python.org/downloads/))
+- **Git** installed ([git-scm.com](https://git-scm.com/))
+- A free **Google Gemini API Key** ([aistudio.google.com](https://aistudio.google.com/))
+- A **Gmail App Password** ([myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords))
+
+---
+
+### 2. Local Installation
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/snehithkumar18/Everydayjobs.git
+   cd Everydayjobs
+   ```
+
+2. **Create and activate a virtual environment**:
+   - **Windows (PowerShell)**:
+     ```powershell
+     python -m venv .venv
+     .\.venv\Scripts\Activate.ps1
+     ```
+   - **macOS / Linux**:
+     ```bash
+     python3 -m venv .venv
+     source .venv/bin/activate
+     ```
+
+3. **Install dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+---
+
+### 3. Environment Configuration (`.env`)
+
+Create a `.env` file in the root directory:
+
+```ini
+# LLM Provider Configuration
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your_gemini_api_key_here
+SCREEN_MODEL=gemini-3.5-flash-lite
+DRAFT_MODEL=gemini-3.5-flash
+
+# Email Dispatcher Configuration (Gmail SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your_email@gmail.com
+SMTP_PASS=your_16_character_gmail_app_password
+MAIL_TO=your_email@gmail.com
+```
+
+---
+
+### 4. Candidate Profile Configuration (`profile.json`)
+
+Copy the template and fill in your technical projects, skills, and target roles:
 
 ```bash
-git clone <your-repo> && cd jobhunt
-python -m venv .venv && .venv/Scripts/activate      # Windows
-# python -m venv .venv && source .venv/bin/activate # macOS/Linux
-pip install -r requirements.txt
-
-python -m jobhunt run --mock --scorer keyword
+cp profile.example.json profile.json
 ```
 
-`--mock` runs bundled fixtures through the **real parsers** — no network.
-`--scorer keyword` swaps the LLM for a dumb token-overlap stub, so the whole
-pipeline runs with no secrets configured. You should see:
-
-```
-[2/5] filtering
-  prefilter: 12 -> 5 (dropped title=5 location=1 stale=1)
-[3/5] screening 5 jobs (keyword stub — DEV ONLY)
-  3 scored >= 7.0
-[5/5] digest
-  wrote out/digest.html
-
-funnel: 12 scanned -> 5 passed filters -> 5 new -> 3 in digest
-```
-
-Open `out/digest.html` in a browser. That's the email you'd have received.
-
-> The keyword scorer is **dev-only**. It cannot tell a Staff role from a
-> new-grad one and has no idea what the words mean. It exists to prove the
-> plumbing, never to build a digest you'd act on.
-
----
-
-## Set it up for real
-
-### 1. Point it at companies you'd actually join
-
-Edit `companies.yaml`. The slug is the last path segment of a company's public
-careers board:
-
-| Board URL | `ats` | `slug` |
-|---|---|---|
-| `boards.greenhouse.io/stripe` | `greenhouse` | `stripe` |
-| `jobs.lever.co/netlify` | `lever` | `netlify` |
-| `jobs.ashbyhq.com/ramp` | `ashby` | `ramp` |
-
-The shipped list is **examples** — verify each before trusting the output.
-Companies migrate between ATS vendors and slugs go dead. A dead slug prints an
-HTTP status and returns nothing; it never kills the run. Watch the per-board
-counts on stdout: a board reporting 0 every day is a slug that needs fixing.
-
-Start with 10–15 companies. A list of 200 is mostly noise.
-
-**No LinkedIn or Naukri.** Neither has a public API and scraping them violates
-their terms of service. The three ATS endpoints above are documented, unauthenticated,
-and intended to be read.
-
-### 2. Tune the filters
-
-`config.yaml` holds the deterministic gate that runs **before** any LLM call.
-This is the whole cost story — get it right and you spend cents a day.
-
-```yaml
-filters:
-  include_titles: ['\bsde\b', 'software development engineer', ...]
-  exclude_titles: ['\b(staff|principal)\b', '\b(manager)\b', ...]
-  locations: [bangalore, bengaluru, india]
-  allow_remote: true
-  max_age_days: 30
-score_threshold: 7.0
-max_per_digest: 5
-```
-
-> **`sde` does not match "Software Development Engineer".** They share no
-> substring. Use `\bsde\b` for the acronym *and* list the spelled-out variants
-> separately, or you'll silently miss half of Amazon-style postings. There's a
-> test pinning this.
-
-### 3. Build your profile
-
-```bash
-cp .env.example .env      # add ANTHROPIC_API_KEY
-python -m jobhunt profile --resume resume.pdf
-```
-
-PDFs go over as a base64 document block (Anthropic and Gemini both read them
-natively — no OCR, no text extraction library). `.txt` and `.md` also work and
-are the fallback for providers that can't take documents.
-
-This writes `profile.json`. It's gitignored — read it, fix anything the model
-got wrong, and keep it out of version control.
-
-### 4. Run it
-
-```bash
-python -m jobhunt run                    # build the digest
-python -m jobhunt run --send             # ...and email it
-python -m jobhunt run --limit 10         # cost guard while tuning
-python -m jobhunt run --no-draft         # screen only, skip the expensive pass
+Edit `profile.json` with your real portfolio:
+```json
+{
+  "name": "Your Name",
+  "current_title": "Software Engineer / Applied AI Engineer",
+  "years_experience": 0,
+  "seniority": "junior",
+  "location": "India",
+  "work_authorization": "India (Eligible for India and Worldwide Remote)",
+  "education": "B.E. Computer Science",
+  "core_skills": ["Python", "FastAPI", "PyTorch", "Computer Vision", "PostgreSQL", "Docker"],
+  "notable_projects": [
+    "AI Crop Doctor: Computer vision plant pathology diagnostic platform using PyTorch and YOLOv8",
+    "QRAVE: Full-stack backend system with FastAPI, PostgreSQL, Redis, and BullMQ"
+  ],
+  "target_titles": [
+    "Software Engineer", "Backend Developer", "AI Engineer", "Python Developer"
+  ]
+}
 ```
 
 ---
 
-## Picking providers
+### 5. Run & Test Locally
 
-Screening reads hundreds of jobs and wants the cheapest decent model. Drafting
-runs ~5 times and wants the best one. So they're configured separately:
+- **Run without emailing (Dry Run)**:
+  ```bash
+  python -m jobhunt run
+  ```
+  *Outputs the formatted digest to `out/digest.html` and tracking data to `out/tracker.csv`.*
 
-```bash
-LLM_PROVIDER=anthropic          # sets both stages
-SCREEN_PROVIDER=groq            # ...override per stage
-DRAFT_PROVIDER=anthropic
-SCREEN_MODEL=claude-haiku-4-5-20251001
-DRAFT_MODEL=claude-sonnet-5
-```
+- **Run and send live email digest**:
+  ```bash
+  python -m jobhunt run --send
+  ```
 
-| Provider | Value | Key | PDF resumes | Notes |
-|---|---|---|---|---|
-| Anthropic | `anthropic` | `ANTHROPIC_API_KEY` | yes | default; uses the official SDK |
-| Google Gemini | `gemini` | `GEMINI_API_KEY` | yes | generous free tier |
-| Groq | `groq` | `GROQ_API_KEY` | no | very fast, free tier |
-| OpenAI-compatible | `openai-compatible` | `GROQ_API_KEY` + `LLM_BASE_URL` | no | Together, OpenRouter, vLLM |
-| Ollama | `ollama` | none | no | fully local, `OLLAMA_HOST` |
-
-Everything except Anthropic goes over plain `requests`, so you can delete the
-`anthropic` line from `requirements.txt` and still run the whole thing.
-
-Adding a provider is one class in [`jobhunt/providers.py`](jobhunt/providers.py)
-with a `complete()` method, plus an entry in the `PROVIDERS` dict.
+- **Run offline unit tests**:
+  ```bash
+  python -m pytest
+  ```
 
 ---
 
-## Tracking
+## ☁️ 24/7 Cloud Automation (GitHub Actions)
 
-`seen.json` is both the dedupe index and the application tracker — a job you've
-already been shown is never shown again. It's gitignored: it's yours, and
-shipping one would break the first run for anyone who cloned the repo.
+The repository includes a pre-configured GitHub Actions workflow in [`.github/workflows/daily.yml`](.github/workflows/daily.yml) that executes twice every day (**6:00 AM & 6:00 PM IST**).
 
-```bash
-python -m jobhunt applied "greenhouse:stripe:5501001"   # id is in the digest
-python -m jobhunt stats                                 # + CSV export
-```
+### Setting Up GitHub Repository Secrets
+Go to your GitHub repository: **Settings → Secrets and variables → Actions → New repository secret** and add:
 
-`out/tracker.csv` opens in any spreadsheet.
+1. `GEMINI_API_KEY`: Your Google AI Studio Gemini API Key
+2. `SMTP_USER`: Your Gmail address (e.g. `your_email@gmail.com`)
+3. `SMTP_PASS`: Your 16-character Gmail App Password
+4. `MAIL_TO`: Recipient email address
+5. `PROFILE_JSON`: The complete JSON content of your `profile.json`
 
----
-
-## Scheduling
-
-[`.github/workflows/daily.yml`](.github/workflows/daily.yml) runs it at 06:00 IST
-on weekdays. `seen.json` is carried between runs with `actions/cache`, not
-committed — it's personal, and a `seen.json` in the repo would mark every job as
-already-seen for anyone who cloned it. Nothing personal ever enters git.
-
-Repository **secrets** to set (Settings → Secrets and variables → Actions):
-
-| Secret | What |
-|---|---|
-| `PROFILE_JSON` | the entire contents of your local `profile.json` |
-| `ANTHROPIC_API_KEY` | (or `GEMINI_API_KEY` / `GROQ_API_KEY`) |
-| `SMTP_USER` / `SMTP_PASS` | Gmail address + **App Password**, not your login |
-| `MAIL_TO` | where the digest goes |
-
-Optional repository **variables**: `LLM_PROVIDER`, `SCREEN_PROVIDER`,
-`DRAFT_PROVIDER`, `SCREEN_MODEL`, `DRAFT_MODEL`.
-
-Trigger it by hand first — Actions → *daily job digest* → *Run workflow*, with
-`dry_run` ticked to build the digest artifact without emailing.
-
-Gmail needs an [App Password](https://myaccount.google.com/apppasswords); your
-normal password stops working once 2FA is on.
+Once set, GitHub will automatically run the pipeline, screen new postings, and deliver the email digest to your inbox even when your computer is completely shut down.
 
 ---
 
-## Layout
+## 💻 Local Windows Task Scheduler (Optional)
 
+To run automatically in the background on your local machine:
+```powershell
+# Morning Task (6:00 AM IST)
+$action = New-ScheduledTaskAction -Execute "$PWD\.venv\Scripts\python.exe" -Argument "-m jobhunt run --send" -WorkingDirectory "$PWD"
+$trigger = New-ScheduledTaskTrigger -Daily -At 6:00AM
+Register-ScheduledTask -TaskName "JobHunt_Morning_6AM" -Action $action -Trigger $trigger -Description "Autonomous Job Hunt Morning Run"
+
+# Evening Task (6:00 PM IST)
+$trigger2 = New-ScheduledTaskTrigger -Daily -At 6:00PM
+Register-ScheduledTask -TaskName "JobHunt_Evening_6PM" -Action $action -Trigger $trigger2 -Description "Autonomous Job Hunt Evening Run"
 ```
-jobhunt/
-  fetch.py       Job dataclass, strip_html, 3 pure parsers, fetch_all
-  prefilter.py   title/location/freshness gate — no LLM, no cost
-  providers.py   the swappable provider interface + 5 backends
-  llm.py         screen() / draft() / build_profile() / keyword stub
-  digest.py      HTML email (inline CSS only — Gmail strips <style>)
-  mailer.py      SMTP
-  store.py       seen.json dedupe + tracker + CSV export
-  mock.py        fixtures in each ATS's native JSON shape
-  cli.py         argparse: profile / run / applied / stats
-config.yaml      filters, thresholds, paths
-companies.yaml   boards to poll
-tests/           55 tests, no network, no key
-```
-
-HTTP is kept out of the parsers on purpose. Each `parse_*(slug, company, body)`
-takes already-decoded JSON and returns `list[Job]`, which is what makes `--mock`
-exercise the real code path instead of a parallel implementation.
-
-Every job gets `job_id = "{ats}:{slug}:{id}"` — globally unique, so the same
-role posted on two boards is still two rows, and a re-run never duplicates.
-
-### ATS quirks the parsers handle
-
-- **Greenhouse** — `content` is HTML-entity-escaped HTML. Unescape *before*
-  stripping tags and again after, or you ship `&amp;` into the prompt.
-- **Lever** — `createdAt` is epoch **milliseconds**. The full JD is split across
-  `descriptionPlain` **+** `lists[].text` **+** `lists[].content` **+**
-  `additionalPlain`; concatenate all four or you lose the requirements section
-  and every job looks unqualified.
-- **Ashby** — skip `isListed: false`; those are unpublished drafts.
 
 ---
 
-## Tests
+## 📊 Application Tracking & Audit
 
-```bash
-python -m pytest tests -q
-```
-
-No network, no API key, no cost. The suite covers:
-
-- each parser against fixtures in its **native** ATS shape
-- the two bugs that cost me an evening each: Lever's epoch-ms timestamps
-  (fixture dates are generated relative to *now*, never hardcoded, so they
-  can't silently age past the freshness gate) and the `\bsde\b` regex
-- prefilter rejects the planted junk: wrong seniority, wrong city, wrong
-  function, a stale posting, an unlisted Ashby draft
-- the LLM layer with the provider stubbed: batching splits at the configured
-  size, JD truncation is applied before send, fenced/preamble/object-or-array
-  JSON all parse, scores land on the right job when returned out of order, a
-  failed batch warns and the run continues, and the draft kit always has every
-  key the digest renders
+- Every processed job is indexed in `seen.json` to prevent duplicates.
+- All evaluated jobs with their match scores and AI reasoning are recorded in `out/tracker.csv`.
+- Mark jobs you've applied to via CLI:
+  ```bash
+  python -m jobhunt applied "greenhouse:gitlab:8556658002"
+  ```
+- View application funnel stats:
+  ```bash
+  python -m jobhunt stats
+  ```
 
 ---
 
-## Cost
-
-With ~15 boards, a tight `config.yaml`, Haiku screening and Sonnet drafting,
-this lands in the low single-digit rupees per day. The prefilter is what makes
-that true: nothing reaches a model until it has already passed title, location
-and freshness. Set `SCREEN_PROVIDER=groq` or `gemini` and it's free.
-
-Use `--limit` while tuning filters so a bad regex can't run up a bill.
+## 📄 License
+MIT License. Built for autonomous, high-efficiency job intelligence.
