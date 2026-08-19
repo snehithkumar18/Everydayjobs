@@ -105,8 +105,10 @@ def cmd_run(args) -> int:
             return 1
         include_remote = bool(cfg.get("include_remote_feeds", True))
         linkedin_searches = cfg.get("linkedin_searches") or []
+        unstop_searches = cfg.get("unstop_searches") or []
         jobs = fetch_all(companies, include_remote_feeds=include_remote,
-                         linkedin_searches=linkedin_searches)
+                         linkedin_searches=linkedin_searches,
+                         unstop_searches=unstop_searches)
     scanned = len(jobs)
     if not scanned:
         print("no postings fetched — check the slugs in companies.yaml")

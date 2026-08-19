@@ -173,6 +173,22 @@ linkedin_searches:
   - {query: "SQL Developer", location: "India"}
   - {query: "Junior Data Engineer", location: "India"}
 
+# --- Unstop Off-Campus Fresher & Campus Drive Search -------------------------
+unstop_searches:
+  - "Software Engineer"
+  - "Software Developer"
+  - "Junior Software Engineer"
+  - "Associate Software Engineer"
+  - "Fresher"
+  - "Python Developer"
+  - "Backend Developer"
+  - "Full Stack Developer"
+  - "AI Engineer"
+  - "Machine Learning"
+  - "Graduate Engineer Trainee"
+  - "System Engineer"
+  - "Java Developer"
+
 # --- LLM stages -------------------------------------------------------------
 screen_batch_size: 8      # jobs per screening call. Higher = cheaper, sloppier.
 screen_jd_chars: 1400     # JD truncation for screening

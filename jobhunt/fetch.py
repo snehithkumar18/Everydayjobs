@@ -399,10 +399,56 @@ def fetch_linkedin(query: str, location: str = "India", count: int = 25) -> list
     return out
 
 
+def fetch_unstop(query: str, count: int = 25) -> list[Job]:
+    """Fetch live off-campus fresher & junior jobs from Unstop's public API."""
+    import urllib.parse
+    url = f"https://unstop.com/api/public/opportunity/search-result?opportunity=jobs&per_page={count}&searchTerm={urllib.parse.quote(query)}"
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/json",
+    }
+    out = []
+    try:
+        r = requests.get(url, headers=headers, timeout=TIMEOUT)
+        if r.status_code != 200:
+            return []
+        data = r.json()
+        items = (data.get("data") or {}).get("data") or []
+        for it in items:
+            jid = str(it.get("id") or "")
+            title = it.get("title") or ""
+            org = (it.get("organisation") or {}).get("name") or "Hiring Company"
+            seo_url = it.get("seo_url") or (f"https://unstop.com/{it.get('public_url')}" if it.get("public_url") else "")
+            desc = strip_html(it.get("details") or "")
+            posted = it.get("updated_at") or it.get("approved_date")
+
+            # Extract city locations
+            loc_list = [loc.get("city") for loc in (it.get("locations") or []) if loc.get("city")]
+            loc = ", ".join(loc_list) if loc_list else "India"
+
+            slug = re.sub(r'[^a-zA-Z0-9]', '', org.lower())[:15] or "unstop"
+            out.append(Job(
+                job_id=f"unstop:{slug}:{jid}",
+                ats="unstop",
+                company=org,
+                title=title,
+                location=loc,
+                url=seo_url,
+                description=desc or f"{title} at {org}. Off-campus fresher opportunity on Unstop.",
+                posted_at=posted,
+            ))
+            if len(out) >= count:
+                break
+    except Exception:
+        return []
+    return out
+
+
 def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
               linkedin_searches: Iterable[dict] | None = None,
+              unstop_searches: Iterable[str] | None = None,
               max_workers: int = 24) -> list[Job]:
-    """Fetch jobs concurrently from all company ATS boards, remote feeds, and LinkedIn."""
+    """Fetch jobs concurrently from all company ATS boards, remote feeds, LinkedIn, and Unstop."""
     jobs: list[Job] = []
     fut_map = {}
 
@@ -430,6 +476,13 @@ def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
                 if q:
                     fut = executor.submit(fetch_linkedin, q, loc)
                     fut_map[fut] = (f"LinkedIn ({q} - {loc})", "linkedin")
+
+        # Submit Unstop search queries
+        if unstop_searches:
+            for q in unstop_searches:
+                if q:
+                    fut = executor.submit(fetch_unstop, q)
+                    fut_map[fut] = (f"Unstop ({q})", "unstop")
 
         for fut in concurrent.futures.as_completed(fut_map):
             name, src = fut_map[fut]
