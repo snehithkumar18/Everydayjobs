@@ -83,19 +83,23 @@ companies:
   - {ats: greenhouse, slug: block,             name: Block (Square)}
 
   # --- India Tech Leaders, Unicorns & GCCs ---
-  - {ats: lever,      slug: paytm,             name: Paytm}
-  - {ats: lever,      slug: meesho,            name: Meesho}
-  - {ats: lever,      slug: cred,              name: CRED}
-  - {ats: lever,      slug: zeta,              name: Zeta}
-  - {ats: lever,      slug: porter,            name: Porter}
-  - {ats: greenhouse, slug: inmobi,            name: InMobi}
-  - {ats: greenhouse, slug: phonepe,           name: PhonePe}
-  - {ats: greenhouse, slug: slice,             name: slice}
-  - {ats: greenhouse, slug: groww,             name: Groww}
-  - {ats: greenhouse, slug: tcs,               name: TCS}
-  - {ats: greenhouse, slug: thoughtworks,      name: Thoughtworks}
-  - {ats: greenhouse, slug: rubrik,            name: Rubrik}
-  - {ats: greenhouse, slug: coherehealth,      name: Cohere Health}
+  - {ats: lever,            slug: paytm,             name: Paytm}
+  - {ats: lever,            slug: meesho,            name: Meesho}
+  - {ats: lever,            slug: cred,              name: CRED}
+  - {ats: lever,            slug: zeta,              name: Zeta}
+  - {ats: lever,            slug: porter,            name: Porter}
+  - {ats: lever,            slug: fi,                name: Fi Money}
+  - {ats: greenhouse,       slug: inmobi,            name: InMobi}
+  - {ats: greenhouse,       slug: phonepe,           name: PhonePe}
+  - {ats: greenhouse,       slug: slice,             name: slice}
+  - {ats: greenhouse,       slug: groww,             name: Groww}
+  - {ats: greenhouse,       slug: tcs,               name: TCS}
+  - {ats: greenhouse,       slug: thoughtworks,      name: Thoughtworks}
+  - {ats: greenhouse,       slug: rubrik,            name: Rubrik}
+  - {ats: greenhouse,       slug: coherehealth,      name: Cohere Health}
+  - {ats: greenhouse,       slug: druva,             name: Druva}
+  - {ats: smartrecruiters,  slug: freshworks,        name: Freshworks}
+  - {ats: smartrecruiters,  slug: sutherland,        name: Sutherland}
 
   # --- Security, Infrastructure & Enterprise ---
   - {ats: greenhouse, slug: crowdstrike,       name: CrowdStrike}
