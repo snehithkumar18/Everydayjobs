@@ -341,9 +341,64 @@ def fetch_remote_feed(feed_name: str, session: requests.Session | None = None) -
         return []
 
 
+def fetch_linkedin(query: str, location: str = "India", count: int = 20) -> list[Job]:
+    """Fetch recent live jobs from LinkedIn's public guest search API."""
+    import urllib.parse
+    url = (
+        f"https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search"
+        f"?keywords={urllib.parse.quote(query)}&location={urllib.parse.quote(location)}&start=0"
+    )
+    out = []
+    try:
+        r = requests.get(url, headers=UA, timeout=TIMEOUT)
+        if r.status_code != 200:
+            return []
+
+        cards = re.findall(r'<li[\s\S]*?</li>', r.text)
+        for card in cards:
+            title_m = re.search(r'<h3[^>]*class="[^"]*base-search-card__title[^"]*"[^>]*>([^<]+)</h3>', card)
+            company_m = re.search(r'<h4[^>]*class="[^"]*base-search-card__subtitle[^"]*"[\s\S]*?>([^<]+)<', card)
+            if not company_m:
+                company_m = re.search(r'<a[^>]*class="[^"]*hidden-nested-link[^"]*"[^>]*>([^<]+)</a>', card)
+            loc_m = re.search(r'<span[^>]*class="[^"]*job-search-card__location[^"]*"[^>]*>([^<]+)</span>', card)
+            link_m = re.search(r'<a[^>]*class="[^"]*base-card__full-link[^"]*"[^>]*href="([^"?]+)', card)
+
+            if not title_m or not link_m:
+                continue
+
+            raw_title = title_m.group(1).strip()
+            raw_company = company_m.group(1).strip() if company_m else "LinkedIn Posting"
+            raw_loc = loc_m.group(1).strip() if loc_m else location
+            raw_url = link_m.group(1).strip()
+
+            jid_m = re.search(r'-([0-9]{8,12})(?:\?|$)', raw_url)
+            jid = jid_m.group(1) if jid_m else str(abs(hash(raw_url)))
+
+            clean_title = html.unescape(raw_title)
+            clean_company = html.unescape(raw_company)
+            clean_loc = html.unescape(raw_loc)
+            slug = re.sub(r'[^a-zA-Z0-9]', '', clean_company.lower())[:15] or "company"
+
+            out.append(Job(
+                job_id=f"linkedin:{slug}:{jid}",
+                ats="linkedin",
+                company=clean_company,
+                title=clean_title,
+                location=clean_loc,
+                url=raw_url,
+                description=f"{clean_title} at {clean_company} in {clean_loc}. Direct job listing on LinkedIn.",
+            ))
+            if len(out) >= count:
+                break
+    except Exception:
+        return []
+    return out
+
+
 def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
+              linkedin_searches: Iterable[dict] | None = None,
               max_workers: int = 24) -> list[Job]:
-    """Fetch jobs concurrently from all company ATS boards and free remote feeds."""
+    """Fetch jobs concurrently from all company ATS boards, remote feeds, and LinkedIn."""
     jobs: list[Job] = []
     fut_map = {}
 
@@ -362,6 +417,15 @@ def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
             for feed_key in REMOTE_FEEDS:
                 fut = executor.submit(fetch_remote_feed, feed_key)
                 fut_map[fut] = (f"Feed ({feed_key})", "remote-feed")
+
+        # Submit LinkedIn search queries
+        if linkedin_searches:
+            for s in linkedin_searches:
+                q = s.get("query")
+                loc = s.get("location", "India")
+                if q:
+                    fut = executor.submit(fetch_linkedin, q, loc)
+                    fut_map[fut] = (f"LinkedIn ({q} - {loc})", "linkedin")
 
         for fut in concurrent.futures.as_completed(fut_map):
             name, src = fut_map[fut]

@@ -121,6 +121,15 @@ filters:
   # Boards often re-stamp `updated_at`, so this is a soft signal, not a promise.
   max_age_days: 30
 
+# --- LinkedIn Live Search ----------------------------------------------------
+linkedin_searches:
+  - {query: "Python Developer", location: "India"}
+  - {query: "Software Engineer Fresher", location: "India"}
+  - {query: "Applied AI Engineer", location: "India"}
+  - {query: "Backend Developer", location: "Bengaluru"}
+  - {query: "Machine Learning Engineer", location: "Hyderabad"}
+  - {query: "Full Stack Engineer", location: "India"}
+
 # --- LLM stages -------------------------------------------------------------
 screen_batch_size: 8      # jobs per screening call. Higher = cheaper, sloppier.
 screen_jd_chars: 1400     # JD truncation for screening
