@@ -39,6 +39,7 @@ companies:
   - {ats: ashby,      slug: modal,             name: Modal}
   - {ats: ashby,      slug: cursor,            name: Cursor}
   - {ats: ashby,      slug: replit,            name: Replit}
+  - {ats: ashby,      slug: harvey,            name: Harvey AI}
 
   # --- Cloud, DevTools & Infrastructure ---
   - {ats: greenhouse, slug: stripe,            name: Stripe}
