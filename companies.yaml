@@ -40,6 +40,16 @@ companies:
   - {ats: ashby,      slug: cursor,            name: Cursor}
   - {ats: ashby,      slug: replit,            name: Replit}
   - {ats: ashby,      slug: harvey,            name: Harvey AI}
+  - {ats: ashby,      slug: cerebras,          name: Cerebras Systems}
+  - {ats: ashby,      slug: writer,            name: Writer AI}
+  - {ats: ashby,      slug: vapi,              name: Vapi AI}
+  - {ats: ashby,      slug: tavily,            name: Tavily AI}
+  - {ats: ashby,      slug: warp,              name: Warp}
+  - {ats: ashby,      slug: resend,            name: Resend}
+  - {ats: greenhouse, slug: stabilityai,       name: Stability AI}
+  - {ats: ashby,      slug: runway,            name: Runway ML}
+  - {ats: ashby,      slug: quora,             name: Quora / Poe}
+  - {ats: ashby,      slug: speakeasy,         name: Speakeasy}
 
   # --- Cloud, DevTools & Infrastructure ---
   - {ats: greenhouse, slug: stripe,            name: Stripe}
@@ -53,11 +63,22 @@ companies:
   - {ats: ashby,      slug: supabase,          name: Supabase}
   - {ats: greenhouse, slug: postman,           name: Postman}
   - {ats: greenhouse, slug: hackerrank,        name: HackerRank}
+  - {ats: greenhouse, slug: fivetran,          name: Fivetran}
+  - {ats: greenhouse, slug: twilio,            name: Twilio}
+  - {ats: greenhouse, slug: braze,             name: Braze}
+  - {ats: ashby,      slug: render,            name: Render}
+  - {ats: greenhouse, slug: pagerduty,         name: PagerDuty}
+  - {ats: greenhouse, slug: yugabyte,          name: YugabyteDB}
   - {ats: greenhouse, slug: launchdarkly,      name: LaunchDarkly}
   - {ats: greenhouse, slug: cockroachlabs,     name: Cockroach Labs}
   - {ats: greenhouse, slug: clickhouse,        name: ClickHouse}
   - {ats: ashby,      slug: temporal,          name: Temporal}
   - {ats: ashby,      slug: neon,              name: Neon}
+  - {ats: ashby,      slug: airbyte,           name: Airbyte}
+  - {ats: greenhouse, slug: planetscale,       name: PlanetScale}
+  - {ats: ashby,      slug: railway,           name: Railway}
+  - {ats: greenhouse, slug: honeycomb,         name: Honeycomb.io}
+  - {ats: greenhouse, slug: branch,            name: Branch Metrics}
   - {ats: greenhouse, slug: starburst,         name: Starburst (Trino)}
 
   # --- Product, SaaS & Consumer Tech ---
