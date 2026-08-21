@@ -25,10 +25,10 @@ _FENCE_CLOSE = re.compile(r"\s*```\s*$", re.M)
 
 DRAFT_KEYS = ("fit_summary", "tailored_bullets", "gaps", "cover_note", "questions_to_ask")
 
-# Output ceilings per stage.
-SCREEN_MAX_TOKENS = 8192
-DRAFT_MAX_TOKENS = 8192
-PROFILE_MAX_TOKENS = 8192
+# Output ceilings per stage (conservative to fit free-tier TPM budgets).
+SCREEN_MAX_TOKENS = 1200
+DRAFT_MAX_TOKENS = 2200
+PROFILE_MAX_TOKENS = 4000
 
 
 def parse_json(raw: str) -> Any:
@@ -175,7 +175,14 @@ def screen(jobs: list[Job], profile: dict, batch_size: int = 8, jd_chars: int = 
     if provider is None or model is None:
         provider, model = resolve("screen")
     batch_size = max(1, int(batch_size))
-    profile_blob = json.dumps(profile, ensure_ascii=False)
+    compact = {
+        "seniority": profile.get("seniority", "junior"),
+        "years_experience": profile.get("years_experience", 0),
+        "target_titles": profile.get("target_titles", [])[:15],
+        "core_skills": profile.get("core_skills", []),
+        "notable_projects": profile.get("notable_projects", []),
+    }
+    profile_blob = json.dumps(compact, ensure_ascii=False)
 
     for start in range(0, len(jobs), batch_size):
         batch = jobs[start:start + batch_size]
