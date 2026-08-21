@@ -69,8 +69,8 @@ jobs:
           LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'groq' }}
           SCREEN_PROVIDER: ${{ vars.SCREEN_PROVIDER || 'groq' }}
           DRAFT_PROVIDER: ${{ vars.DRAFT_PROVIDER || 'groq' }}
-          SCREEN_MODEL: ${{ vars.SCREEN_MODEL || 'openai/gpt-oss-20b' }}
-          DRAFT_MODEL: ${{ vars.DRAFT_MODEL || 'openai/gpt-oss-120b' }}
+          SCREEN_MODEL: ${{ vars.SCREEN_MODEL || 'groq/compound-mini' }}
+          DRAFT_MODEL: ${{ vars.DRAFT_MODEL || 'groq/compound' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
