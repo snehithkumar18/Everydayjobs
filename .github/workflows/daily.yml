@@ -66,11 +66,11 @@ jobs:
 
       - name: Run the pipeline
         env:
-          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'gemini' }}
-          SCREEN_PROVIDER: ${{ vars.SCREEN_PROVIDER || 'gemini' }}
-          DRAFT_PROVIDER: ${{ vars.DRAFT_PROVIDER || 'gemini' }}
-          SCREEN_MODEL: ${{ vars.SCREEN_MODEL || 'gemini-2.5-flash' }}
-          DRAFT_MODEL: ${{ vars.DRAFT_MODEL || 'gemini-2.5-flash' }}
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'groq' }}
+          SCREEN_PROVIDER: ${{ vars.SCREEN_PROVIDER || 'groq' }}
+          DRAFT_PROVIDER: ${{ vars.DRAFT_PROVIDER || 'groq' }}
+          SCREEN_MODEL: ${{ vars.SCREEN_MODEL || 'llama-3.3-70b-versatile' }}
+          DRAFT_MODEL: ${{ vars.DRAFT_MODEL || 'llama-3.3-70b-versatile' }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
@@ -81,9 +81,9 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO || 'snehithetsy@gmail.com' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            python -m jobhunt run
+            python -m jobhunt run --limit 200
           else
-            python -m jobhunt run --send
+            python -m jobhunt run --send --limit 200
           fi
 
       - name: Upload digest

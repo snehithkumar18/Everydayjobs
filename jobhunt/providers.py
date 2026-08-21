@@ -126,13 +126,22 @@ class GeminiProvider(Provider):
     BASE = "https://generativelanguage.googleapis.com/v1beta/models"
 
     def _post(self, model: str, body: dict) -> str:
+        r = None
         for attempt in range(5):
-            r = requests.post(
-                f"{self.BASE}/{model}:generateContent",
-                params={"key": self._env("GEMINI_API_KEY")},
-                json=body,
-                timeout=TIMEOUT,
-            )
+            try:
+                r = requests.post(
+                    f"{self.BASE}/{model}:generateContent",
+                    params={"key": self._env("GEMINI_API_KEY")},
+                    json=body,
+                    timeout=TIMEOUT,
+                )
+            except (requests.ConnectionError, requests.Timeout) as e:
+                if attempt < 4:
+                    wait = 5 * (attempt + 1)
+                    print(f"  ! network error (attempt {attempt+1}/5), retrying in {wait}s: {e}", flush=True)
+                    time.sleep(wait)
+                    continue
+                raise LLMError(f"gemini network error after 5 attempts: {e}") from e
             if r.status_code == 429 and attempt < 4:
                 time.sleep(10 * (attempt + 1))
                 continue

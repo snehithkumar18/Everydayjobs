@@ -18,6 +18,7 @@ from .fetch import Job
 from .providers import LLMError, Provider, resolve
 
 import time
+import requests
 
 _FENCE_OPEN = re.compile(r"^\s*```(?:json|JSON)?\s*", re.M)
 _FENCE_CLOSE = re.compile(r"\s*```\s*$", re.M)
@@ -271,7 +272,8 @@ def draft(jobs: list[Job], profile: dict, jd_chars: int = 6000,
             }
             print(f"  drafted {j.title} @ {j.company}")
             time.sleep(4.0)
-        except (LLMError, ValueError, KeyError, TypeError) as e:
+        except (LLMError, ValueError, KeyError, TypeError,
+                requests.ConnectionError, requests.Timeout) as e:
             print(f"  ! draft failed for {j.job_id} ({type(e).__name__}: {e})")
             j.draft = {k: ("" if k in ("fit_summary", "cover_note") else []) for k in DRAFT_KEYS}
             time.sleep(2.0)
