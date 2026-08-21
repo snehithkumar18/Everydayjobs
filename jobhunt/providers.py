@@ -276,7 +276,7 @@ PROVIDERS = {
 DEFAULT_MODELS = {
     "anthropic": {"screen": "claude-haiku-4-5-20251001", "draft": "claude-sonnet-5"},
     "gemini": {"screen": "gemini-3.5-flash-lite", "draft": "gemini-3.5-flash"},
-    "groq": {"screen": "llama-3.3-70b-versatile", "draft": "llama-3.3-70b-versatile"},
+    "groq": {"screen": "openai/gpt-oss-20b", "draft": "openai/gpt-oss-120b"},
     "openai-compatible": {"screen": "gpt-4o-mini", "draft": "gpt-4o"},
     "ollama": {"screen": "llama3.1", "draft": "llama3.1"},
 }
