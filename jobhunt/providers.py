@@ -214,14 +214,36 @@ class OpenAICompatProvider(Provider):
                                    "max_tokens": max_tokens, "temperature": 0.2}
         if json_mode:
             payload["response_format"] = {"type": "json_object"}
-        r = requests.post(
-            f"{base}/chat/completions",
-            headers={"Authorization": f"Bearer {self._env(self.key_env)}"},
-            json=payload,
-            timeout=TIMEOUT,
-        )
-        if r.status_code != 200:
-            raise LLMError(f"{self.name} HTTP {r.status_code}: {r.text[:300]}")
+
+        r = None
+        for attempt in range(5):
+            try:
+                r = requests.post(
+                    f"{base}/chat/completions",
+                    headers={"Authorization": f"Bearer {self._env(self.key_env)}"},
+                    json=payload,
+                    timeout=TIMEOUT,
+                )
+            except (requests.ConnectionError, requests.Timeout) as e:
+                if attempt < 4:
+                    wait = 4 * (attempt + 1)
+                    print(f"  ! {self.name} network error (attempt {attempt+1}/5), retrying in {wait}s...", flush=True)
+                    time.sleep(wait)
+                    continue
+                raise LLMError(f"{self.name} network error after 5 attempts: {e}") from e
+
+            if r.status_code == 429 and attempt < 4:
+                wait = 15 * (attempt + 1)
+                print(f"  ! {self.name} rate limit 429 (attempt {attempt+1}/5), waiting {wait}s...", flush=True)
+                time.sleep(wait)
+                continue
+            if r.status_code in (500, 503) and attempt < 4:
+                time.sleep(3 * (attempt + 1))
+                continue
+            if r.status_code != 200:
+                raise LLMError(f"{self.name} HTTP {r.status_code}: {r.text[:300]}")
+            break
+
         try:
             return r.json()["choices"][0]["message"]["content"]
         except (KeyError, IndexError, ValueError) as e:
