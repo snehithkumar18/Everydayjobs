@@ -145,14 +145,13 @@ The candidate is an ambitious fresher / junior software & AI engineer (B.E. Comp
 
 SCORING GUIDELINES (0 to 10):
   7.0 - 9.0 (STRONG FIT / WORTH APPLYING):
-    - Entry-level, Junior, Associate, Graduate, Trainee, SDE 1, or 0-2 years roles where candidate's tech skills (Python, Java, Backend, Full Stack, AI/ML, Computer Vision, GenAI) and portfolio projects provide legitimate evidence to succeed in the role.
-    - Treat candidate's hands-on project depth as valid evidence for entry-level and 0-2 year requirements.
-  5.0 - 6.5 (PLAUSIBLE):
-    - Mid-level roles (2-3 years) with significant overlap in core stack where candidate could plausibly compete.
-  0.0 - 4.0 (MISMATCH / REJECT):
-    - Genuinely senior roles (Senior, Lead, Principal, Staff, Architect, Manager, Director, 4+ years required).
+    - STRICT REQUIREMENT: Open to Freshers (0 years) or 0-1 years of experience (e.g. Fresher, Graduate Engineer Trainee, Entry Level, SDE 1, Junior Developer, Associate Software Engineer, Intern).
+    - Strong technical alignment with candidate's core stack (Python, FastAPI, Java, React, Backend, Full Stack, AI/ML, Computer Vision, GenAI, LangGraph, SQL, Docker).
+  0.0 - 4.0 (MISMATCH / STRICT REJECT):
+    - ANY job strictly requiring 2+ years of professional/industry experience.
+    - Genuinely senior/mid-level roles (Senior, Lead, Principal, Staff, Architect, SDE 2, SDE 3, Manager, Director).
     - Wrong domain (e.g. Sales, Recruiting, iOS/Android mobile-only, Frontend-only).
-    - Country/residency restrictions the candidate cannot meet.
+    - Country/residency restrictions the candidate cannot meet (e.g. US/UK only).
 
 LOCATION & WORK ELIGIBILITY:
 The candidate is based in India with Indian work authorization (no US/UK/EU visa).

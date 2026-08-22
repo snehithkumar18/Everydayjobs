@@ -2,11 +2,12 @@
 include_remote_feeds: true
 
 filters:
+  strict_fresher_filter: true
   # Title regexes, matched case-insensitively against the job title only.
   # A title must match at least one include AND zero excludes.
   include_titles:
-    # SDE & General Software
-    - '\b(sde|sde-?1|sde-?2|sde-?i|sde-?ii)\b'
+    # SDE & General Software (Entry-Level / Fresher / SDE-1)
+    - '\b(sde|sde-?1|sde-?i|junior\s+sde|associate\s+sde)\b'
     # Software / Backend / Full Stack
     - '\b(software\s+development\s+engineer|sde|swe)\b'
     - '\b(software\s+engineer|software\s+developer|application\s+developer|app\s+developer)\b'
@@ -51,6 +52,8 @@ filters:
   # Anything matching these is dropped even if an include matched.
   exclude_titles:
     - '\b(senior|sr\.?|principal|staff|lead|chief|head\s+of|director|vp|vice\s+president|distinguished|architect)\b' # too senior
+    - '\b(sde[- ]?(?:2|3|4|5|ii|iii|iv|v)|software\s+engineer\s*(?:2|3|4|5|ii|iii|iv|v)|developer\s*(?:2|3|4|5|ii|iii|iv|v))\b' # experienced bands
+    - '\b(mid[- ]?level|mid[- ]?senior|experienced|expert|specialist|consultant|senior\s+consultant|tech\s+lead|team\s+lead)\b' # experienced levels
     - '\b(manager|management|coordinator|executive\s+assistant)\b'
     - '\b(sales|account\s+executive|marketing|recruit|recruiter|customer\s+support|customer\s+success|business\s+development)\b'
     - '\b(ios|android|mobile|flutter|react\s+native|game\s+developer)\b' # wrong discipline
