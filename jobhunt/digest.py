@@ -54,14 +54,23 @@ def _card(j: Job) -> str:
             f'border:1px solid {LINE};border-radius:8px;color:{TEXT};font-size:14px;'
             f'line-height:1.6;white-space:pre-wrap;">{html.escape(cover)}</div>')
 
-    resume_note = ""
+    kit_badges = []
     if getattr(j, "resume_pdf_path", None) or getattr(j, "resume_tex_path", None):
         r_path = os.path.basename(j.resume_pdf_path or j.resume_tex_path)
-        resume_note = (
-            f'<div style="margin-top:10px;padding:8px 12px;background:#1e293b;border-radius:6px;'
-            f'color:#38bdf8;font-size:12px;font-weight:600;display:inline-block;">'
-            f'📄 Tailored 1-Page LaTeX Resume Attached ({r_path})</div>'
+        kit_badges.append(
+            f'<span style="padding:6px 10px;background:#1e293b;border-radius:6px;'
+            f'color:#38bdf8;font-size:12px;font-weight:600;margin-right:8px;display:inline-block;">'
+            f'📄 1-Page Resume ({r_path})</span>'
         )
+    if getattr(j, "cover_letter_pdf_path", None) or getattr(j, "cover_letter_tex_path", None):
+        c_path = os.path.basename(j.cover_letter_pdf_path or j.cover_letter_tex_path)
+        kit_badges.append(
+            f'<span style="padding:6px 10px;background:#1e293b;border-radius:6px;'
+            f'color:#a78bfa;font-size:12px;font-weight:600;display:inline-block;">'
+            f'✉️ Cover Letter ({c_path})</span>'
+        )
+
+    kit_note = f'<div style="margin-top:10px;">{"".join(kit_badges)}</div>' if kit_badges else ""
 
     return f"""
 <div style="background:{CARD};border:1px solid {LINE};border-radius:12px;padding:18px;margin-bottom:14px;">
@@ -70,7 +79,7 @@ def _card(j: Job) -> str:
     <div style="padding-left:12px;">{_badge(j.score)}</div>
   </div>
   <div style="color:{MUTED};font-size:13px;margin-top:5px;">{html.escape(meta)}</div>
-  {resume_note}
+  {kit_note}
   {para(j.reason or "")}
   {_section("Why it fits", para(d.get("fit_summary", "")))}
   {_section("Resume bullets for this role", _bullets(d.get("tailored_bullets", [])))}

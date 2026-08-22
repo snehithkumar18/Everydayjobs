@@ -281,6 +281,75 @@ def compile_latex_to_pdf(tex_content: str, output_pdf_path: Path) -> bool:
     return False
 
 
+COVER_LETTER_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "cover_letter_template.tex"
+OUT_COVER_LETTERS_DIR = ROOT / "out" / "cover_letters"
+
+
+def render_cover_letter_latex(job: Job, portfolio: dict[str, Any], cover_note: str) -> str:
+    """Renders LaTeX cover letter matching resume styling."""
+    template = COVER_LETTER_TEMPLATE_PATH.read_text(encoding="utf-8")
+    
+    from datetime import datetime
+    today_str = datetime.now().strftime("%B %d, %Y")
+    
+    def _to_latex(s: str) -> str:
+        s = re.sub(r"\*\*([^*]+)\*\*", r"\\textbf{\1}", s)
+        s = re.sub(r"\*([^*]+)\*", r"\\textit{\1}", s)
+        s = s.replace("%", r"\%").replace("&", r"\&").replace("$", r"\$").replace("_", r"\_")
+        return s
+
+    # Convert paragraphs in cover note to LaTeX paragraphs
+    paragraphs = [p.strip() for p in cover_note.split("\n\n") if p.strip()]
+    if not paragraphs:
+        paragraphs = [cover_note.strip()]
+
+    formatted_paras = []
+    for p in paragraphs:
+        # replace inner single newlines with spaces
+        p_clean = " ".join(p.splitlines())
+        formatted_paras.append(_to_latex(p_clean))
+
+    body_latex = "\n\n".join(formatted_paras)
+
+    tex = template
+    tex = tex.replace("{{ date }}", today_str)
+    tex = tex.replace("{{ company }}", _to_latex(job.company))
+    tex = tex.replace("{{ title }}", _to_latex(job.title))
+    tex = tex.replace("{{ letter_body }}", body_latex)
+    return tex
+
+
+def build_cover_letter_for_job(job: Job, portfolio: dict[str, Any] | None = None) -> tuple[str, Path]:
+    """Generates and compiles a tailored LaTeX cover letter for a job."""
+    if portfolio is None:
+        portfolio = _load_master_portfolio()
+
+    # Use the tailored cover note drafted by the pipeline, or fallback
+    cover_note = (job.draft or {}).get("cover_note") or (
+        f"I am writing to express my strong interest in the {job.title} position at {job.company}. "
+        f"With hands-on experience architecting high-performance backend systems, agentic AI platforms, "
+        f"and scalable full-stack applications, I am eager to contribute to your engineering goals.\n\n"
+        f"In my previous work, I have engineered distributed real-time platforms handling high concurrency, "
+        f"built multi-tool AI systems with vector databases, and deployed production CI/CD pipelines. "
+        f"I look forward to discussing how my technical background aligns with your team's needs."
+    )
+
+    latex_code = render_cover_letter_latex(job, portfolio, cover_note)
+
+    safe_company = re.sub(r"\W+", "_", job.company.lower()).strip("_")
+    safe_title = re.sub(r"\W+", "_", job.title.lower()).strip("_")
+    pdf_filename = f"Cover_Letter_Snehith_{safe_company}_{safe_title}.pdf"
+    pdf_path = OUT_COVER_LETTERS_DIR / pdf_filename
+
+    compile_latex_to_pdf(latex_code, pdf_path)
+
+    # Save .tex alongside PDF
+    tex_path = pdf_path.with_suffix(".tex")
+    tex_path.write_text(latex_code, encoding="utf-8")
+
+    return latex_code, pdf_path
+
+
 def build_resume_for_job(job: Job, provider: Provider | None = None, model: str | None = None) -> tuple[str, Path]:
     """Main function: tailors LaTeX and compiles a PDF resume for a specific job."""
     if provider is None or model is None:
@@ -302,3 +371,18 @@ def build_resume_for_job(job: Job, provider: Provider | None = None, model: str 
     tex_path.write_text(latex_code, encoding="utf-8")
 
     return latex_code, pdf_path
+
+
+def build_application_kit_for_job(job: Job, provider: Provider | None = None, model: str | None = None) -> dict[str, Any]:
+    """Builds both tailored 1-page Resume AND Cover Letter PDFs for a job."""
+    portfolio = _load_master_portfolio()
+    resume_tex, resume_pdf = build_resume_for_job(job, provider=provider, model=model)
+    cover_tex, cover_pdf = build_cover_letter_for_job(job, portfolio=portfolio)
+
+    return {
+        "resume_tex_path": str(resume_pdf.with_suffix(".tex")),
+        "resume_pdf_path": str(resume_pdf) if resume_pdf.exists() else None,
+        "cover_letter_tex_path": str(cover_pdf.with_suffix(".tex")),
+        "cover_letter_pdf_path": str(cover_pdf) if cover_pdf.exists() else None,
+    }
+

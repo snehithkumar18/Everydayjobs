@@ -47,6 +47,8 @@ class Job:
     draft: dict[str, Any] = field(default_factory=dict)
     resume_tex_path: str | None = None
     resume_pdf_path: str | None = None
+    cover_letter_tex_path: str | None = None
+    cover_letter_pdf_path: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
