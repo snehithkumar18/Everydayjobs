@@ -262,40 +262,50 @@
         ]
       }
     },
-    "thumbai": {
-      "id": "thumbai",
-      "name": "ThumbAI",
-      "subtitle": "AI-Powered Multimodal Image Editing Platform",
+    "thumbnail_genius": {
+      "id": "thumbnail_genius",
+      "name": "Thumbnail Genius",
+      "subtitle": "AI-Powered YouTube Thumbnail Studio & Computer Vision Platform",
       "live_url": "",
       "github_url": "https://github.com/snehithkumar18",
       "url_label": "GitHub",
       "domain_tags": [
+        "Full-Stack AI",
         "Computer Vision",
         "Generative AI",
-        "PyTorch",
-        "FastAPI",
         "React",
-        "Docker",
+        "FastAPI",
+        "Distributed Systems",
+        "BullMQ",
         "Redis",
-        "Full-Stack AI"
+        "Docker",
+        "SaaS"
       ],
-      "tech_stack": "React, TypeScript, FastAPI, Python, PyTorch, OpenCV, InsightFace, GFPGAN, SAM, EasyOCR, Redis, BullMQ, Docker",
-      "overview": "Full-stack AI image processing and thumbnail synthesis platform integrating deep learning models for segmentation, OCR, and face restoration with asynchronous background Redis queues.",
+      "tech_stack": "React 18, TypeScript, Konva.js, FastAPI, Python, PyTorch, YOLOv8, PaddleOCR, InsightFace, GFPGAN, SAM, Supabase, Redis, BullMQ, Docker",
+      "overview": "Production-grade 4-tier AI SaaS platform featuring a Canva-like Konva.js canvas editor, multi-model vision pipeline (YOLOv8 + PaddleOCR + InsightFace + GFPGAN + SAM), asynchronous BullMQ/Redis job queues, and 18 Supabase Edge Functions with multi-provider AI routing.",
       "metrics": {
-        "vision_models": "Integrated 5 deep learning models (YOLOv8, Segment Anything / SAM, EasyOCR, InsightFace, GFPGAN)",
-        "queue_throughput": "Asynchronous job queuing via Redis and BullMQ ensuring zero UI thread blocking during heavy GPU/CPU image inference",
-        "caching_efficiency": "Perceptual image hashing to eliminate redundant inference calculations across identical user uploads"
+        "cv_pipeline": "6 local ML models integrated (YOLOv8, PaddleOCR, InsightFace, GFPGAN, SAM, Rembg) with priority-based IoA > 70% layer deduplication",
+        "queue_throughput": "Redis/BullMQ background worker architecture preventing API blocking during compute-heavy neural inference",
+        "coordinate_precision": "End-to-end [0..1] normalized float space coordinate pipeline preventing pixel misalignment across canvas zooms and aspect ratios",
+        "ai_router": "Multi-provider AI routing engine with SHA-256 content-addressable caching, rate limit detection, and 60-minute automatic cooldowns"
       },
       "bullet_variants": {
-        "computer_vision_ai": [
-          "Built a full-stack AI image-processing platform using **React, FastAPI, PyTorch, OpenCV, and Docker** with asynchronous background task processing.",
-          "Designed **Redis/BullMQ job queues** for long-running computer-vision workloads and implemented perceptual image hashing to eliminate redundant model inferences.",
-          "Engineered image segmentation, text recognition, face enhancement, and compositing pipelines using **YOLOv8, SAM, EasyOCR, InsightFace, and GFPGAN**."
+        "full_stack_ai": [
+          "Architected a 4-tier AI SaaS platform using **React 18, TypeScript, Konva.js, Fastify, FastAPI, and Supabase** with 18 serverless Edge Functions and credit monetization.",
+          "Engineered a computer vision pipeline combining **YOLOv8, PaddleOCR, InsightFace, and SAM** for element detection, layer extraction, and instruction-based AI editing.",
+          "Implemented asynchronous **BullMQ and Redis job queues** with SHA-256 content-addressable caching, eliminating compute bottlenecks during neural inference.",
+          "Built a neural face swap engine using **InsightFace and GFPGAN** with LAB color space skin tone normalization and 60/40 sharp-to-raw detail blending."
         ],
-        "full_stack_vision": [
-          "Architected a decoupled React + FastAPI image synthesis platform with containerized Docker deployment and real-time processing status indicators.",
-          "Integrated multimodal computer vision workflows in **PyTorch and OpenCV**, exposing high-throughput REST endpoints for automated image enhancement.",
-          "Developed client-side interactive canvas editors and image preview pipelines with automated layer compositing and asset exporting."
+        "computer_vision_aiml": [
+          "Developed a multi-model vision detection system fusing **YOLOv8 object detection, PaddleOCR text recognition, and OpenCV Canny edge contours** with IoA > 70% deduplication.",
+          "Built an instruction-guided image editing pipeline with **SAM (Segment Anything Model)** for contour mask refinement and multi-provider failover (**Google Gemini, FLUX.1 Kontext**).",
+          "Implemented high-fidelity neural face swapping using **InsightFace inswapper_128 and GFPGANv1.4** detail restoration with LAB color space alignment.",
+          "Designed an 18% bounding box padding algorithm on OCR text boxes to capture typographic styling effects (strokes, shadows, glows) on stylized text."
+        ],
+        "frontend_canvas": [
+          "Built an interactive HTML5 canvas studio with **Konva.js and React 18**, featuring real-time layer overlays, comparison slider, vector text editing, and zoom/pan controls.",
+          "Engineered end-to-end **[0.0, 1.0] normalized float coordinate systems**, ensuring pixel-perfect alignment across arbitrary image resolutions and device viewports.",
+          "Architected frontend state with **Zustand, React Query, and Web Workers** for off-main-thread SHA-256 image hashing and client-side background removal via WASM."
         ]
       }
     }
