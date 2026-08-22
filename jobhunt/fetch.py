@@ -45,6 +45,8 @@ class Job:
     score: float | None = None
     reason: str | None = None
     draft: dict[str, Any] = field(default_factory=dict)
+    resume_tex_path: str | None = None
+    resume_pdf_path: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)

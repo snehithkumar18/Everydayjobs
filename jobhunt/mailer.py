@@ -6,7 +6,7 @@ import smtplib
 from email.message import EmailMessage
 
 
-def send(subject: str, html_body: str) -> None:
+def send(subject: str, html_body: str, attachments: list[str] | None = None) -> None:
     host = os.getenv("SMTP_HOST", "smtp.gmail.com")
     port = int(os.getenv("SMTP_PORT", "587"))
     user = os.environ["SMTP_USER"]
@@ -20,8 +20,22 @@ def send(subject: str, html_body: str) -> None:
     msg.set_content("This digest is HTML. Open it in an HTML-capable client.")
     msg.add_alternative(html_body, subtype="html")
 
+    if attachments:
+        for fpath in attachments:
+            if not fpath or not os.path.exists(fpath):
+                continue
+            fname = os.path.basename(fpath)
+            try:
+                with open(fpath, "rb") as f:
+                    file_data = f.read()
+                maintype = "application"
+                subtype = "pdf" if fname.endswith(".pdf") else "octet-stream"
+                msg.add_attachment(file_data, maintype=maintype, subtype=subtype, filename=fname)
+            except Exception as e:
+                print(f"  ! failed attaching {fname}: {e}")
+
     with smtplib.SMTP(host, port, timeout=30) as s:
         s.starttls()
         s.login(user, password)
         s.send_message(msg)
-    print(f"  mailed -> {to_addr}")
+    print(f"  mailed -> {to_addr} (with {len(attachments or [])} attachments)")

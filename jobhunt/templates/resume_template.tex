@@ -1,0 +1,136 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[top=0.38in,bottom=0.38in,left=0.45in,right=0.45in]{geometry}
+\usepackage{tabularx}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\tabcolsep}{0pt}
+
+\definecolor{dark}{HTML}{111111}
+
+\titleformat{\section}
+{\large\bfseries\color{dark}}
+{}
+{0pt}
+{}
+[\vspace{-4pt}\hrule]
+
+\titlespacing{\section}{0pt}{5pt}{3pt}
+
+\setlist[itemize]{
+    leftmargin=14pt,
+    noitemsep,
+    topsep=1pt,
+    parsep=0pt
+}
+
+\begin{document}
+
+%==================== HEADER ====================
+
+\begin{center}
+
+{\Huge\textbf{BARKAM SNEHITH KUMAR}}
+
+\vspace{2pt}
+
+\small
+\href{mailto:snehithkumarbarkam@gmail.com}
+{snehithkumarbarkam@gmail.com}
+\ $|$ +91 7330689520
+\ $|$
+\href{https://github.com/snehithkumar18}{GitHub}
+\ $|$
+\href{https://www.linkedin.com/in/snehith-kumar-4266071b8/}{LinkedIn}
+\ $|$ Hyderabad, India
+
+\end{center}
+
+\vspace{-5pt}
+
+%==================== SUMMARY ====================
+
+\section*{SUMMARY}
+
+{{ summary }}
+
+%==================== SKILLS ====================
+
+\section*{TECHNICAL SKILLS}
+
+\textbf{Languages:} {{ skills_languages }}
+
+\textbf{Computer Science:} {{ skills_cs }}
+
+\textbf{Backend:} {{ skills_backend }}
+
+\textbf{Frontend:} {{ skills_frontend }}
+
+\textbf{Databases:} {{ skills_databases }}
+
+\textbf{Engineering:} {{ skills_engineering }}
+
+\textbf{AI/ML:} {{ skills_aiml }}
+
+%==================== EXPERIENCE ====================
+
+\section*{EXPERIENCE}
+
+\textbf{AI \& Data Engineering Intern --- Viswam.AI / IIIT Hyderabad}
+\hfill \textbf{May 2025 -- Jun 2025}
+
+\begin{itemize}
+{% for bullet in experience_bullets %}
+    \item {{ bullet }}
+{% endfor %}
+\end{itemize}
+
+%==================== PROJECTS ====================
+
+\section*{PROJECTS}
+
+{% for proj in selected_projects %}
+\textbf{ {{ proj.name }} {% if proj.subtitle %}--- {{ proj.subtitle }}{% endif %} }
+{% if proj.url %}\hfill \href{ {{ proj.url }} }{\textbf{ {{ proj.url_label }} }} {% endif %}
+
+\textit{ {{ proj.tech_stack }} }
+
+\begin{itemize}
+{% for bullet in proj.bullets %}
+    \item {{ bullet }}
+{% endfor %}
+\end{itemize}
+{% endfor %}
+
+%==================== EDUCATION ====================
+
+\section*{EDUCATION}
+
+\textbf{Matrusri Engineering College, Hyderabad}
+\hfill \textbf{Nov 2022 -- Jun 2026}
+
+B.E. in Computer Science and Engineering
+\hfill \textbf{CGPA: 8.24/10}
+
+\textbf{Kakatiya Junior College, Nizamabad}
+\hfill \textbf{Jun 2020 -- May 2022}
+
+Telangana Board of Intermediate Education
+\hfill \textbf{91.9\%}
+
+%==================== CERTIFICATIONS ====================
+
+\section*{CERTIFICATIONS}
+
+\textbf{Google AI Agents Intensive Course}\\
+\textbf{Oracle Cloud Infrastructure Foundations Associate}\\
+\textbf{Oracle --- Agentic AI Certification}\\
+\textbf{Microsoft AI Innovators Hub --- Agentic AI Workshop}\\
+\textbf{Career Essentials in Generative AI --- Microsoft \& LinkedIn}
+
+\end{document}

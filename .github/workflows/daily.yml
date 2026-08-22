@@ -48,6 +48,12 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Install LaTeX for PDF Resumes
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends texlive-latex-base texlive-fonts-recommended texlive-latex-extra
+
+
       - name: Write profile.json
         # profile.json is gitignored (it is derived from your resume), so CI
         # gets it from a secret or falls back to profile.example.json.

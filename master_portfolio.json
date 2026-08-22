@@ -1,0 +1,303 @@
+{
+  "personal_info": {
+    "name": "BARKAM SNEHITH KUMAR",
+    "email": "snehithkumarbarkam@gmail.com",
+    "phone": "+91 7330689520",
+    "github": "https://github.com/snehithkumar18",
+    "linkedin": "https://www.linkedin.com/in/snehith-kumar-4266071b8/",
+    "location": "Hyderabad, India"
+  },
+  "education": [
+    {
+      "institution": "Matrusri Engineering College, Hyderabad",
+      "degree": "B.E. in Computer Science and Engineering",
+      "period": "Nov 2022 -- Jun 2026",
+      "grade": "CGPA: 8.24/10"
+    },
+    {
+      "institution": "Kakatiya Junior College, Nizamabad",
+      "degree": "Telangana Board of Intermediate Education",
+      "period": "Jun 2020 -- May 2022",
+      "grade": "91.9%"
+    }
+  ],
+  "certifications": [
+    "Google AI Agents Intensive Course",
+    "Oracle Cloud Infrastructure Foundations Associate",
+    "Oracle --- Agentic AI Certification",
+    "Microsoft AI Innovators Hub --- Agentic AI Workshop",
+    "Career Essentials in Generative AI --- Microsoft & LinkedIn"
+  ],
+  "experience": [
+    {
+      "role": "AI & Data Engineering Intern",
+      "company": "Viswam.AI / IIIT Hyderabad",
+      "period": "May 2025 -- Jun 2025",
+      "bullets": [
+        "Developed backend components and REST APIs using **Python, FastAPI, Streamlit, and Hugging Face** for AI-focused applications.",
+        "Worked with multilingual text, audio, and video datasets, performing data validation, preprocessing, quality checks, debugging, and testing.",
+        "Collaborated with engineering teams on AI application development, deployment, and iterative software improvements."
+      ]
+    }
+  ],
+  "projects": {
+    "qrave": {
+      "id": "qrave",
+      "name": "QRAVE / ServeQ",
+      "subtitle": "Smart Contactless Ordering & POS Platform",
+      "live_url": "https://qravee.me/",
+      "github_url": "https://github.com/snehithkumar18",
+      "url_label": "Live",
+      "domain_tags": [
+        "Full-Stack",
+        "Backend",
+        "Distributed Systems",
+        "WebSockets",
+        "Databases",
+        "FinTech",
+        "System Design"
+      ],
+      "tech_stack": "React 19, Node.js, Express.js, PostgreSQL, Supabase, Redis, p-queue, Razorpay, Tailwind CSS",
+      "overview": "Decoupled multi-tenant SaaS contactless ordering and POS platform supporting real-time kitchen operations, automated split merchant payouts, and sub-200ms WebSocket order broadcasting.",
+      "metrics": {
+        "sync_latency": "<200ms order-to-kitchen transmission latency using WebSocket protocols",
+        "network_traffic_reduction": "Reduced backend request traffic by 90% by replacing HTTP polling with Supabase Postgres WAL real-time channels",
+        "concurrency_handling": "Stabilized API response times at <250ms during load testing simulation of up to 5,000 concurrent user sessions",
+        "payload_optimization": "Reduced client-server payload sizes by 35% using Express gzip compression and optimized schemas"
+      },
+      "bullet_variants": {
+        "full_stack": [
+          "Architected a scalable, multi-tenant contactless ordering SaaS platform using **React 19, Node.js, Express, and Supabase (PostgreSQL)**, supporting high-concurrency restaurant operations.",
+          "Designed an automated split-payment distribution workflow using **Razorpay Route API**, routing merchant payouts with **HMAC-SHA256** cryptographic signature verification.",
+          "Eliminated database polling bottlenecks by replacing HTTP polling with **Supabase Real-time WebSocket channels** (listening to PostgreSQL WAL), reducing network traffic by 90%.",
+          "Engineered an asynchronous transaction queue using **p-queue** to throttle outbound API calls (max concurrency 15), preventing payment processor rate limits and memory spikes."
+        ],
+        "backend_sde": [
+          "Built a high-performance **Node.js/Express REST API** with Helmet security headers, stateless JWT validation, layered rate-limiting, and structured error boundaries.",
+          "Engineered relational database schemas in **PostgreSQL** with ACID-compliant transaction logs, foreign key constraints, and indexing across multi-tenant restaurant and order tables.",
+          "Designed an asynchronous queuing mechanism with **p-queue** to throttle outbound payment gateway operations, stabilizing CPU and memory utilization during traffic surges.",
+          "Integrated **Supabase WebSocket replication** directly from PostgreSQL Write-Ahead Logs (WAL) to broadcast live orders to kitchen dashboards in under 200ms."
+        ],
+        "high_concurrency_fintech": [
+          "Implemented split-payment routing and automated vendor commission splits via **Razorpay Route API** secured with HMAC-SHA256 webhook validation.",
+          "Prevented payment gateway rate limits (HTTP 429) during peak traffic spikes by deploying an in-memory priority queue using **p-queue** (concurrency ceiling of 15).",
+          "Engineered resilient real-time state synchronization via custom reconnection hooks (**useSupabaseChannelReconnect**), maintaining WebSocket sync through network dropouts."
+        ]
+      }
+    },
+    "ai_crop_doctor": {
+      "id": "ai_crop_doctor",
+      "name": "AI Crop Doctor",
+      "subtitle": "Multimodal Agricultural Diagnostic & Advisory Platform",
+      "live_url": "",
+      "github_url": "https://github.com/snehithkumar18",
+      "url_label": "GitHub",
+      "domain_tags": [
+        "AI/ML",
+        "Computer Vision",
+        "Generative AI",
+        "LLMs",
+        "Python Backend",
+        "Deep Learning",
+        "Multimodal AI"
+      ],
+      "tech_stack": "Python, PyTorch, YOLOv8, MobileNetV2, ResNet50, OpenCV, Groq API (Llama 3.3), Flask, gTTS, FFmpeg",
+      "overview": "Fault-tolerant, localized multimodal agricultural advisory system classifying 38 crop disease classes, gating inputs via YOLOv8, cross-referencing real-time meteorological data, and synthesizing multilingual voice advisory via LLM reasoning.",
+      "metrics": {
+        "macro_f1": "94.2% Macro-F1 score across 38 distinct crop-disease classes using fine-tuned MobileNetV2",
+        "ood_rejection_rate": ">99% True Rejection Rate (TRR) on non-agricultural images using YOLOv8n Out-Of-Distribution gatekeeper",
+        "false_rejection_rate": "1.2% False Rejection Rate on valid crop leaves",
+        "e2e_latency": "~3.4s (3400ms) End-to-End Latency across simulated 4G networks from image upload to voice synthesis"
+      },
+      "bullet_variants": {
+        "aiml_vision": [
+          "Deployed a fine-tuned **MobileNetV2 CNN classifier** diagnosing 38 distinct crop diseases, achieving a **94.2% Macro-F1 score** on severely imbalanced botanical datasets.",
+          "Implemented **YOLOv8n** as an Out-of-Distribution (OOD) visual gatekeeper to filter non-agricultural inputs, achieving a **>99% True Rejection Rate** to prevent hallucinations.",
+          "Engineered an adaptive ROI preprocessing pipeline using **OpenCV and PIL**, dynamically extracting plant bounding boxes, normalizing HSV color ratios, and optimizing PyTorch tensors.",
+          "Leveraged **Llama-3 LLMs via Groq API** to fuse visual disease classifications with live **OpenWeatherMap API** climate data, generating structured preventive treatment plans."
+        ],
+        "backend_python": [
+          "Architected a RESTful **Flask backend** orchestrating complex asynchronous pipelines between local PyTorch inference engines, OpenWeatherMap API, and Groq LLMs.",
+          "Engineered a multi-tiered fault-tolerance fallback chain (**MobileNetV2 $->$ ResNet50 $->$ Groq Vision API**), ensuring near-100% diagnostic uptime under model errors.",
+          "Implemented strict upload security using **Werkzeug** sanitization and optimized server response pipelines to achieve **3.4s end-to-end processing latency**.",
+          "Built a localized text-to-speech audio synthesis pipeline using **deep-translator, gTTS, and FFmpeg**, streaming multilingual audio advisories directly to client browsers."
+        ],
+        "full_stack_ai": [
+          "Developed a responsive multi-modal web platform using **Flask, JavaScript, HTML5 Geolocation, and Web Speech API**, enabling hands-free voice dictation for rural users.",
+          "Built end-to-end computer vision diagnostic workflows with **PyTorch and OpenCV**, achieving **94.2% accuracy** across 38 plant pathology classes.",
+          "Constructed dynamic multi-language translation and audio delivery pipelines (**deep-translator + gTTS**), converting LLM diagnoses into regional voice advisories."
+        ]
+      }
+    },
+    "snehith_gpt": {
+      "id": "snehith_gpt",
+      "name": "SnehithGPT",
+      "subtitle": "Autonomous Agentic AI Platform & Multi-Tool RAG Engine",
+      "live_url": "",
+      "github_url": "https://github.com/snehithkumar18",
+      "url_label": "GitHub",
+      "domain_tags": [
+        "Agentic AI",
+        "LangGraph",
+        "LangChain",
+        "RAG",
+        "FastAPI",
+        "Python",
+        "Vector Databases",
+        "DevOps",
+        "AWS",
+        "Docker",
+        "LLMs"
+      ],
+      "tech_stack": "Python 3.11, FastAPI, LangGraph, LangChain, Google Gemini 2.5, ChromaDB, Tavily, SQLite, Docker, AWS (ECR/EC2), GitHub Actions",
+      "overview": "Production-grade full-stack Agentic AI chatbot featuring autonomous tool orchestration via LangGraph StateGraph, RAG over multi-format documents with ChromaDB, real-time token SSE streaming, long-term SQLite memory, and push-to-deploy AWS CI/CD pipeline.",
+      "metrics": {
+        "agentic_tools": "5 autonomous tools orchestrated via LangGraph conditional edges (RAG, Web Search, Long-term Memory, Recall, Sandboxed Calculator)",
+        "rag_throughput": "Recursive chunking (900 chars, 150 overlap) with ChromaDB and Gemini embeddings across 6 file formats (PDF, DOCX, TXT, MD, PY, CSV)",
+        "cicd_automation": "Fully automated 2-job GitHub Actions CI/CD pipeline deploying Docker containers to AWS ECR and EC2 self-hosted runner",
+        "streaming_latency": "Sub-100ms first-token latency using async FastAPI SSE streaming with intelligent tool-chunk filtering"
+      },
+      "bullet_variants": {
+        "agentic_ai": [
+          "Architected an autonomous agentic AI platform using **Python, FastAPI, LangGraph, and Google Gemini 2.5**, implementing the **ReAct pattern** with conditional edge routing across 5 integrated tools.",
+          "Built a multi-document **RAG pipeline using ChromaDB vector database** and Google Gemini Embeddings (*gemini-embedding-001*), supporting recursive chunking and thread-scoped retrieval across 6 file formats.",
+          "Engineered real-time token streaming via **Server-Sent Events (SSE)** with custom chunk filtering to prevent raw intermediate tool-call JSON from leaking into the UI.",
+          "Integrated **Tavily Web Search API** and persistent SQLite state checkpointing (**SqliteSaver**), enabling multi-turn conversations with autonomous real-time information retrieval."
+        ],
+        "backend_python_sde": [
+          "Developed an asynchronous REST and SSE backend using **FastAPI, Uvicorn, SQLAlchemy, and SQLite**, managing thread-isolated session state, chat history, and long-term memory facts.",
+          "Implemented a secure execution sandbox for agent math tools with zero-builtin restricted **eval()** environments, mitigating arbitrary code execution risks.",
+          "Optimized agent initialization using a **singleton agent caching pattern** (_AGENT_CACHE), avoiding graph recompilation overhead across concurrent multi-model user requests.",
+          "Constructed automated CI/CD workflows with **GitHub Actions, Docker, Amazon ECR, and Amazon EC2**, enabling automated container builds and zero-touch deployments."
+        ],
+        "full_stack_devops": [
+          "Created a responsive ChatGPT-inspired web application using **FastAPI, Jinja2, Vanilla JavaScript, and Web Speech API** for browser-native voice dictation.",
+          "Containerized the entire application with multi-stage **Docker Compose** and deployed automated CI/CD pipelines targeting **AWS EC2** via GitHub Actions runners.",
+          "Engineered thread-scoped vector indexing in **ChromaDB** ensuring strict multi-tenant privacy across uploaded documents and conversational long-term memory."
+        ]
+      }
+    },
+    "tripmate_ai": {
+      "id": "tripmate_ai",
+      "name": "TripMate AI",
+      "subtitle": "Multi-Agent AI Travel Planner & Route Intelligence Platform",
+      "live_url": "",
+      "github_url": "https://github.com/snehithkumar18",
+      "url_label": "GitHub",
+      "domain_tags": [
+        "Multi-Agent AI",
+        "LangGraph",
+        "FastAPI",
+        "Python",
+        "NLP",
+        "Groq Llama 3.3",
+        "PostgreSQL",
+        "System Design",
+        "External APIs"
+      ],
+      "tech_stack": "Python 3.11, FastAPI, LangGraph, LangChain, Groq Cloud (Llama 3.3 70B), PostgreSQL, PostgresSaver, AviationStack API, Tavily Search, airportsdata, pycountry, Docker",
+      "overview": "Multi-Agent AI travel planning platform coordinating 4 specialized agents (Flight, Hotel, Itinerary, Final) in a sequential StateGraph pipeline, featuring a custom 7-tier deterministic NLP route parsing engine, real-time flight tracking, and PostgreSQL state checkpointing.",
+      "metrics": {
+        "nlp_tiers": "7-tier deterministic NLP route parsing strategy with 80+ static country/airport knowledge bases without ML dependencies",
+        "agent_pipeline": "4 specialized AI agents executing in sequence with centralized blackboard state management (TravelState)",
+        "db_persistence": "Dual-mode conversation checkpointing via PostgreSQL (psycopg binary driver) with automatic MemorySaver fallback",
+        "api_resilience": "Graceful degradation across 3 external APIs (AviationStack, Tavily, Groq) with structured error returns"
+      },
+      "bullet_variants": {
+        "multi_agent_llm": [
+          "Architected a multi-agent AI travel planner using **LangGraph StateGraph**, orchestrating 4 specialized agents (Flight, Hotel, Itinerary, Final) with centralized **Blackboard state management**.",
+          "Engineered a custom **7-tier deterministic NLP route parsing engine** in Python, resolving natural-language routes to IATA airport codes via **airportsdata and pycountry** without heavy ML dependencies.",
+          "Integrated **Groq Llama 3.3 70B** for high-speed itinerary reasoning, synthesizing live flight schedules from **AviationStack API** and hotel discovery from **Tavily Search API**.",
+          "Implemented stateful multi-turn planning with **PostgresSaver** checkpointing, supporting automatic **MemorySaver** fallback and remote SSL connection enforcement."
+        ],
+        "backend_fastapi": [
+          "Built a high-performance **FastAPI REST API** serving a multi-agent AI pipeline with Pydantic schema validation, structured JSON responses, and comprehensive error handling.",
+          "Constructed a resilient external API orchestration layer integrating **AviationStack, Tavily, and Groq** with graceful degradation patterns preventing pipeline crashes on network timeouts.",
+          "Implemented database connection pooling using **psycopg 3.3 with binary drivers**, managing conversation checkpointing with thread isolation across concurrent user requests.",
+          "Containerized the service with multi-stage **Docker** builds on *python:3.11-slim*, optimizing layer caching for production-grade **Uvicorn ASGI** execution."
+        ],
+        "full_stack_nlp": [
+          "Developed an interactive single-page application using **FastAPI, Jinja2, marked.js, and html2pdf.js**, enabling client-side Markdown rendering and high-definition A4 PDF export.",
+          "Engineered a weighted airport scoring algorithm (+100 city match, +50 intl code) to disambiguate international transit hubs from free-form natural language prompts.",
+          "Designed a responsive glassmorphic dark-theme UI with localStorage thread persistence for multi-turn travel planning across browser sessions."
+        ]
+      }
+    },
+    "everydayjobs": {
+      "id": "everydayjobs",
+      "name": "EverydayJobs",
+      "subtitle": "Autonomous Job Intelligence & Application Prep Pipeline",
+      "live_url": "",
+      "github_url": "https://github.com/snehithkumar18/Everydayjobs",
+      "url_label": "GitHub",
+      "domain_tags": [
+        "Python",
+        "Automation",
+        "Distributed Ingestion",
+        "Groq LPU",
+        "LLMs",
+        "CI/CD",
+        "GitHub Actions",
+        "System Design"
+      ],
+      "tech_stack": "Python 3.11, Groq LPU API (Llama 3.3 / GPT-OSS), REST APIs, BeautifulSoup4, Jinja2, Pytest, GitHub Actions",
+      "overview": "Autonomous job intelligence system concurrently ingesting 12,000+ postings across 100+ direct ATS boards, LinkedIn, and Unstop with zero-cost deterministic filtering, multi-stage Groq LLM evaluation, and automated daily email digest dispatch.",
+      "metrics": {
+        "ingestion_scale": "Ingests 12,000+ live jobs across 100+ ATS portals (Greenhouse, Lever, Ashby, SmartRecruiters) in ~15s using 16 concurrent worker threads",
+        "prefilter_efficiency": "Drops 95%+ irrelevant jobs in <50ms with zero LLM cost using multi-attribute regex heuristics",
+        "test_coverage": "70 automated unit tests covering parsers, rate-limit backoff, deduplication index, and JSON repair",
+        "cloud_automation": "100% serverless daily automation via GitHub Actions cron with actions/cache state persistence"
+      },
+      "bullet_variants": {
+        "automation_backend": [
+          "Engineered a high-throughput job intelligence pipeline in **Python** ingesting **12,000+ job postings** across 100+ direct ATS endpoints using concurrent thread pools.",
+          "Designed a zero-cost deterministic prefiltering engine filtering 95%+ irrelevant postings in <50ms using multi-tiered regex rules, geographic constraints, and 7-day age cutoffs.",
+          "Integrated **Groq LPU inference** for two-stage candidate screening and personalized application kit drafting (cover letters, bullet rewrites, interview questions).",
+          "Constructed a fully automated **GitHub Actions CI/CD cron pipeline** persisting state via *actions/cache*, dispatching dark-mode HTML digests to Gmail via TLS."
+        ],
+        "full_stack_python": [
+          "Architected an autonomous job application assistant with **Python, REST APIs, Groq LLMs, and SMTP mailer**, producing customized application kits for high-scoring jobs.",
+          "Built **70 comprehensive unit tests** with Pytest covering concurrent scrapers, 429 rate limit backoff, UTF-8 state serialization, and network fault tolerance.",
+          "Developed responsive dark-mode HTML email templates with dynamic score badges and direct application links delivered daily at 6:00 AM and 6:00 PM IST."
+        ]
+      }
+    },
+    "thumbai": {
+      "id": "thumbai",
+      "name": "ThumbAI",
+      "subtitle": "AI-Powered Multimodal Image Editing Platform",
+      "live_url": "",
+      "github_url": "https://github.com/snehithkumar18",
+      "url_label": "GitHub",
+      "domain_tags": [
+        "Computer Vision",
+        "Generative AI",
+        "PyTorch",
+        "FastAPI",
+        "React",
+        "Docker",
+        "Redis",
+        "Full-Stack AI"
+      ],
+      "tech_stack": "React, TypeScript, FastAPI, Python, PyTorch, OpenCV, InsightFace, GFPGAN, SAM, EasyOCR, Redis, BullMQ, Docker",
+      "overview": "Full-stack AI image processing and thumbnail synthesis platform integrating deep learning models for segmentation, OCR, and face restoration with asynchronous background Redis queues.",
+      "metrics": {
+        "vision_models": "Integrated 5 deep learning models (YOLOv8, Segment Anything / SAM, EasyOCR, InsightFace, GFPGAN)",
+        "queue_throughput": "Asynchronous job queuing via Redis and BullMQ ensuring zero UI thread blocking during heavy GPU/CPU image inference",
+        "caching_efficiency": "Perceptual image hashing to eliminate redundant inference calculations across identical user uploads"
+      },
+      "bullet_variants": {
+        "computer_vision_ai": [
+          "Built a full-stack AI image-processing platform using **React, FastAPI, PyTorch, OpenCV, and Docker** with asynchronous background task processing.",
+          "Designed **Redis/BullMQ job queues** for long-running computer-vision workloads and implemented perceptual image hashing to eliminate redundant model inferences.",
+          "Engineered image segmentation, text recognition, face enhancement, and compositing pipelines using **YOLOv8, SAM, EasyOCR, InsightFace, and GFPGAN**."
+        ],
+        "full_stack_vision": [
+          "Architected a decoupled React + FastAPI image synthesis platform with containerized Docker deployment and real-time processing status indicators.",
+          "Integrated multimodal computer vision workflows in **PyTorch and OpenCV**, exposing high-throughput REST endpoints for automated image enhancement.",
+          "Developed client-side interactive canvas editors and image preview pipelines with automated layer compositing and asset exporting."
+        ]
+      }
+    }
+  }
+}

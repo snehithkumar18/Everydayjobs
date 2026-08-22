@@ -175,6 +175,18 @@ def cmd_run(args) -> int:
             llm.draft(shortlist, profile,
                       jd_chars=int(cfg.get("draft_jd_chars", 6000)),
                       provider=provider, model=model)
+
+            # Generate tailored LaTeX & PDF resumes for top shortlisted jobs
+            print(f"\n  [LaTeX Engine] tailoring 1-page resumes for {len(shortlist)} top jobs...")
+            from .resume_builder import build_resume_for_job
+            for j in shortlist:
+                try:
+                    tex_code, pdf_path = build_resume_for_job(j, provider=provider, model=model)
+                    j.resume_tex_path = str(pdf_path.with_suffix(".tex"))
+                    j.resume_pdf_path = str(pdf_path) if pdf_path.exists() else None
+                    print(f"    ✓ tailored resume: {j.title} @ {j.company}")
+                except Exception as e:
+                    print(f"    ! resume generation skipped for {j.job_id}: {e}")
         except LLMError as e:
             print(f"  ! drafting unavailable: {e}")
 
@@ -187,7 +199,14 @@ def cmd_run(args) -> int:
     sent = False
     if args.send:
         try:
-            mailer.send(subject, doc)
+            attachments = []
+            for j in shortlist:
+                if j.resume_pdf_path and os.path.exists(j.resume_pdf_path):
+                    attachments.append(j.resume_pdf_path)
+                elif j.resume_tex_path and os.path.exists(j.resume_tex_path):
+                    attachments.append(j.resume_tex_path)
+            
+            mailer.send(subject, doc, attachments=attachments[:10])
             sent = True
         except Exception as e:  # bad app password, blocked port, offline
             print(f"  ! email failed ({type(e).__name__}: {e}) — digest still on disk")
