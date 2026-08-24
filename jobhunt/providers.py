@@ -142,6 +142,21 @@ class GeminiProvider(Provider):
                     time.sleep(wait)
                     continue
                 raise LLMError(f"gemini network error after 5 attempts: {e}") from e
+            if r.status_code == 429 and attempt == 4:
+                # Quota exceeded on Gemini: check if Groq fallback is available
+                groq_key = (os.environ.get("GROQ_API_KEY") or "").strip()
+                if groq_key:
+                    try:
+                        groq_prov = GroqProvider()
+                        groq_model = "openai/gpt-oss-20b"
+                        # Extract prompt text
+                        system_text = (body.get("systemInstruction") or {}).get("parts", [{}])[0].get("text", "")
+                        user_text = body.get("contents", [{}])[0].get("parts", [{}])[0].get("text", "")
+                        max_tok = body.get("generationConfig", {}).get("maxOutputTokens", 2000)
+                        return groq_prov.complete(groq_model, system_text, user_text, max_tok)
+                    except Exception:
+                        pass
+                raise LLMError(f"gemini HTTP 429: {r.text[:300]}")
             if r.status_code == 429 and attempt < 4:
                 time.sleep(10 * (attempt + 1))
                 continue
@@ -297,7 +312,7 @@ PROVIDERS = {
 # after setting nothing but a key.
 DEFAULT_MODELS = {
     "anthropic": {"screen": "claude-haiku-4-5-20251001", "draft": "claude-sonnet-5"},
-    "gemini": {"screen": "gemini-3.5-flash-lite", "draft": "gemini-3.5-flash"},
+    "gemini": {"screen": "gemini-2.5-flash-lite", "draft": "gemini-2.5-flash-lite"},
     "groq": {"screen": "openai/gpt-oss-20b", "draft": "openai/gpt-oss-120b"},
     "openai-compatible": {"screen": "gpt-4o-mini", "draft": "gpt-4o"},
     "ollama": {"screen": "llama3.1", "draft": "llama3.1"},
