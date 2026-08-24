@@ -11,14 +11,18 @@ and so you can point screening at Groq while drafting stays on Claude.
 from __future__ import annotations
 
 import json
+import os
 import re
+import sys
+import time
 from typing import Any
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
+import requests
 from .fetch import Job
 from .providers import LLMError, Provider, resolve
-
-import time
-import requests
 
 _FENCE_OPEN = re.compile(r"^\s*```(?:json|JSON)?\s*", re.M)
 _FENCE_CLOSE = re.compile(r"\s*```\s*$", re.M)
@@ -195,11 +199,12 @@ def screen(jobs: list[Job], profile: dict, batch_size: int = 8, jd_chars: int = 
 
         n = start // batch_size + 1
         try:
+            max_t = 4000 if provider.name == "gemini" else SCREEN_MAX_TOKENS
             raw = provider.complete(
                 model, SCREEN_SYSTEM,
                 f"CANDIDATE PROFILE:\n{profile_blob}\n\n"
                 f"JOBS:\n{json.dumps(payload, ensure_ascii=False)}",
-                SCREEN_MAX_TOKENS, json_mode=True,
+                max_t, json_mode=True,
             )
             results = {}
             for r in _as_list(parse_json(raw)):
@@ -258,12 +263,13 @@ def draft(jobs: list[Job], profile: dict, jd_chars: int = 6000,
 
     for j in jobs:
         try:
+            max_t = 4000 if provider.name == "gemini" else DRAFT_MAX_TOKENS
             raw = provider.complete(
                 model, DRAFT_SYSTEM,
                 f"CANDIDATE PROFILE:\n{profile_blob}\n\n"
                 f"JOB: {j.title} at {j.company} ({j.location or 'location not stated'})\n"
                 f"URL: {j.url}\n\n{j.description[:jd_chars]}",
-                DRAFT_MAX_TOKENS, json_mode=True,
+                max_t, json_mode=True,
             )
             kit = parse_json(raw)
             if not isinstance(kit, dict):

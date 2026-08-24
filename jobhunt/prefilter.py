@@ -49,6 +49,14 @@ FRESHER_SIGNALS = [
     r"\b(?:no\s+(?:prior\s+)?experience\s+required|open\s+to\s+freshers|recent\s+graduates?|2024|2025|2026\s+batch)\b",
 ]
 
+SENIORITY_TITLE_COMPILED = [re.compile(p, re.I) for p in SENIORITY_TITLE_PATTERNS]
+OVER_EXPERIENCE_COMPILED = [re.compile(p, re.I) for p in OVER_EXPERIENCE_PATTERNS]
+FRESHER_SIGNALS_COMPILED = [re.compile(p, re.I) for p in FRESHER_SIGNALS]
+
+
+def _any_compiled(compiled: list[re.Pattern], text: str) -> bool:
+    return any(p.search(text) for p in compiled)
+
 
 def _any_match(patterns: list[str], text: str) -> bool:
     return any(re.search(p, text, re.I) for p in patterns)
@@ -72,15 +80,15 @@ def requires_too_much_experience(job: Job) -> bool:
     combined_text = f"{job.title} {job.description[:3000]}".lower()
 
     # Check if job explicitly welcomes freshers or 0-1 / 0-2 yrs
-    is_explicit_fresher = _any_match(FRESHER_SIGNALS, combined_text)
+    is_explicit_fresher = _any_compiled(FRESHER_SIGNALS_COMPILED, combined_text)
 
     # Check if title has senior designations
-    if _any_match(SENIORITY_TITLE_PATTERNS, job.title):
+    if _any_compiled(SENIORITY_TITLE_COMPILED, job.title):
         return True
 
     # If not explicitly a fresher role, check if description mentions 2+ years of experience
     if not is_explicit_fresher:
-        if _any_match(OVER_EXPERIENCE_PATTERNS, combined_text):
+        if _any_compiled(OVER_EXPERIENCE_COMPILED, combined_text):
             return True
 
     return False

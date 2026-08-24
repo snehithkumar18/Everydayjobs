@@ -11,6 +11,11 @@ import os
 import sys
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 import yaml
 
 from . import digest as digest_mod
@@ -186,7 +191,7 @@ def cmd_run(args) -> int:
                     j.resume_pdf_path = kit.get("resume_pdf_path")
                     j.cover_letter_tex_path = kit.get("cover_letter_tex_path")
                     j.cover_letter_pdf_path = kit.get("cover_letter_pdf_path")
-                    print(f"    ✓ tailored Resume & Cover Letter: {j.title} @ {j.company}")
+                    print(f"    + tailored Resume & Cover Letter: {j.title} @ {j.company}")
                 except Exception as e:
                     print(f"    ! application kit generation skipped for {j.job_id}: {e}")
         except LLMError as e:

@@ -87,9 +87,9 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO || 'snehithetsy@gmail.com' }}
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            python -m jobhunt run --limit 200
+            python -m jobhunt run --limit 35
           else
-            python -m jobhunt run --send --limit 200
+            python -m jobhunt run --send --limit 35
           fi
 
       - name: Upload digest

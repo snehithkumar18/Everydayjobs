@@ -118,11 +118,12 @@ def tailor_resume_data(job: Job, portfolio: dict, provider: Provider, model: str
         f"Job Description Excerpt:\n{job.description[:2500]}"
     )
 
+    max_t = 4000 if provider and provider.name == "gemini" else 2200
     raw = provider.complete(
         model=model,
         system=RESUME_TAILOR_SYSTEM,
         user=user_prompt,
-        max_tokens=2200,
+        max_tokens=max_t,
         json_mode=True,
     )
 
@@ -352,11 +353,30 @@ def build_cover_letter_for_job(job: Job, portfolio: dict[str, Any] | None = None
 
 def build_resume_for_job(job: Job, provider: Provider | None = None, model: str | None = None) -> tuple[str, Path]:
     """Main function: tailors LaTeX and compiles a PDF resume for a specific job."""
-    if provider is None or model is None:
-        provider, model = resolve("draft")
-
     portfolio = _load_master_portfolio()
-    tailored_data = tailor_resume_data(job, portfolio, provider, model)
+    try:
+        if provider is None or model is None:
+            provider, model = resolve("draft")
+        tailored_data = tailor_resume_data(job, portfolio, provider, model)
+    except Exception as e:
+        print(f"    ! LLM tailoring fallback for {job.company}: {e}")
+        tailored_data = {
+            "selected_project_ids": ["qrave", "snehith_gpt", "ai_crop_doctor"],
+            "summary": (
+                "Software Engineer with hands-on experience architecting high-concurrency backend services, "
+                "real-time distributed platforms, and agentic AI systems with strong foundations in Data Structures and Algorithms."
+            ),
+            "skills": {
+                "languages": "Java, Python, JavaScript, TypeScript, SQL, C++",
+                "cs": "Data Structures & Algorithms, OOP, DBMS, Operating Systems, Computer Networks, SDLC",
+                "backend": "Node.js, Express.js, FastAPI, Flask, REST APIs, WebSockets",
+                "frontend": "React, TypeScript, JavaScript, HTML5, CSS3, Tailwind CSS",
+                "databases": "PostgreSQL, MySQL, Supabase, Redis",
+                "engineering": "Git, GitHub, Docker, Linux, GitHub Actions, Pytest, Debugging",
+                "aiml": "PyTorch, OpenCV, YOLOv8, LLMs, Generative AI, RAG, Hugging Face",
+            },
+        }
+
     latex_code = render_latex(tailored_data, portfolio)
 
     safe_company = re.sub(r"\W+", "_", job.company.lower()).strip("_")

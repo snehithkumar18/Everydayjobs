@@ -34,8 +34,20 @@ def send(subject: str, html_body: str, attachments: list[str] | None = None) -> 
             except Exception as e:
                 print(f"  ! failed attaching {fname}: {e}")
 
-    with smtplib.SMTP(host, port, timeout=30) as s:
-        s.starttls()
-        s.login(user, password)
-        s.send_message(msg)
-    print(f"  mailed -> {to_addr} (with {len(attachments or [])} attachments)")
+    import time
+    last_err = None
+    for attempt in range(1, 4):
+        try:
+            with smtplib.SMTP(host, port, timeout=30) as s:
+                s.starttls()
+                s.login(user, password)
+                s.send_message(msg)
+            print(f"  mailed -> {to_addr} (with {len(attachments or [])} attachments)")
+            return
+        except Exception as e:
+            last_err = e
+            print(f"  ! SMTP attempt {attempt}/3 failed: {e}")
+            if attempt < 3:
+                time.sleep(3.0)
+
+    raise last_err
