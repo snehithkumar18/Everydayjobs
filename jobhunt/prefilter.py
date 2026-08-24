@@ -94,12 +94,17 @@ def requires_too_much_experience(job: Job) -> bool:
     return False
 
 
+RESTRICTED_NON_INDIA_COMPILED = [re.compile(p, re.I) for p in RESTRICTED_NON_INDIA_PATTERNS]
+
+
 def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
     if not cfg:
         return list(jobs)
 
     inc = cfg.get("include_titles") or [r"."]
     exc = cfg.get("exclude_titles") or []
+    inc_compiled = [re.compile(p, re.I) for p in inc]
+    exc_compiled = [re.compile(p, re.I) for p in exc]
     locs = [l.lower() for l in (cfg.get("locations") or [])]
     allow_remote = bool(cfg.get("allow_remote", True))
     max_age = cfg.get("max_age_days")
@@ -111,7 +116,7 @@ def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
 
     for j in jobs:
         # 1. Title inclusion / exclusion check
-        if not _any_match(inc, j.title) or (exc and _any_match(exc, j.title)):
+        if not _any_compiled(inc_compiled, j.title) or (exc_compiled and _any_compiled(exc_compiled, j.title)):
             stats["title"] += 1
             continue
 
@@ -124,7 +129,7 @@ def prefilter(jobs: list[Job], cfg: dict) -> list[Job]:
         if locs:
             hay = f"{j.location} {j.title}".lower()
             is_remote = allow_remote and any(h in hay for h in REMOTE_HINTS)
-            if is_remote and any(re.search(p, hay, re.I) for p in RESTRICTED_NON_INDIA_PATTERNS):
+            if is_remote and _any_compiled(RESTRICTED_NON_INDIA_COMPILED, hay):
                 if not any(l in hay for l in locs) and not any(g in hay for g in ("worldwide", "global", "anywhere", "apac", "all locations")):
                     is_remote = False
 

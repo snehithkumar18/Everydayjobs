@@ -196,7 +196,7 @@ unstop_searches:
 screen_batch_size: 4      # jobs per screening call (optimized for Groq token limits)
 screen_jd_chars: 800      # JD truncation for screening
 draft_jd_chars: 2200      # JD truncation for drafting
-score_threshold: 6.5      # below this, no draft and no digest slot
+score_threshold: 5.5      # below this, no draft and no digest slot
 max_per_digest: 20        # up to 20 matched jobs per digest
 
 # --- paths ------------------------------------------------------------------
