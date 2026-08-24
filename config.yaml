@@ -168,13 +168,16 @@ linkedin_searches:
   - {query: "Vision AI Engineer", location: "India"}
   - {query: "Image Processing Engineer", location: "India"}
 
-  # --- Java & Database Engineering (Pan-India) ---
-  - {query: "Java Developer", location: "India"}
-  - {query: "Java Software Engineer", location: "India"}
-  - {query: "Junior Java Developer", location: "India"}
-  - {query: "PostgreSQL Developer", location: "India"}
-  - {query: "SQL Developer", location: "India"}
-  - {query: "Junior Data Engineer", location: "India"}
+  # --- Internships & Campus / Fresher Drives (Pan-India) ---
+  - {query: "Software Engineer Intern", location: "India"}
+  - {query: "SDE Intern", location: "India"}
+  - {query: "Python Intern", location: "India"}
+  - {query: "AI Intern", location: "India"}
+  - {query: "Machine Learning Intern", location: "India"}
+  - {query: "Backend Intern", location: "India"}
+  - {query: "Data Science Intern", location: "India"}
+  - {query: "Graduate Trainee Developer", location: "India"}
+  - {query: "Software Developer Intern", location: "India"}
 
 # --- Unstop Off-Campus Fresher & Campus Drive Search -------------------------
 unstop_searches:
@@ -191,6 +194,14 @@ unstop_searches:
   - "Graduate Engineer Trainee"
   - "System Engineer"
   - "Java Developer"
+  - "SDE Intern"
+  - "Software Intern"
+  - "Python Intern"
+  - "AI Intern"
+  - "Machine Learning Intern"
+  - "Backend Intern"
+  - "Data Engineer"
+  - "Web Developer"
 
 # --- LLM stages -------------------------------------------------------------
 screen_batch_size: 4      # jobs per screening call (optimized for Groq token limits)

@@ -296,6 +296,58 @@ def parse_jobicy(_: str, __: str, body: Any) -> list[Job]:
     return out
 
 
+def parse_himalayas(_: str, __: str, body: Any) -> list[Job]:
+    out = []
+    for j in (body or {}).get("jobs", []):
+        jid = str(j.get("id") or "")
+        company = (j.get("companyName") or "Tech Company").strip()
+        restrs = j.get("locationRestrictions") or []
+        loc = ", ".join(restrs) if restrs else "Worldwide / Remote"
+        out.append(Job(
+            job_id=f"himalayas:global:{jid}",
+            ats="himalayas",
+            company=company,
+            title=(j.get("title") or "").strip(),
+            location=f"Remote ({loc})",
+            url=j.get("applicationUrl") or f"https://himalayas.app/companies/{j.get('companySlug')}/jobs/{j.get('slug')}",
+            description=strip_html(j.get("description")),
+            posted_at=j.get("publishedAt"),
+        ))
+    return out
+
+
+def parse_hasjob_xml(xml_text: str) -> list[Job]:
+    import xml.etree.ElementTree as ET
+    out = []
+    try:
+        root = ET.fromstring(xml_text)
+        ns = {"atom": "http://www.w3.org/2005/Atom"}
+        for entry in root.findall("atom:entry", ns):
+            title_raw = entry.findtext("atom:title", default="", namespaces=ns)
+            link_elem = entry.find("atom:link", ns)
+            link = link_elem.attrib.get("href", "") if link_elem is not None else ""
+            content = entry.findtext("atom:content", default="", namespaces=ns) or entry.findtext("atom:summary", default="", namespaces=ns)
+            pub = entry.findtext("atom:published", default="", namespaces=ns) or entry.findtext("atom:updated", default="", namespaces=ns)
+
+            parts = re.split(r"\s+at\s+", title_raw, maxsplit=1, flags=re.I)
+            title = parts[0].strip()
+            company = parts[1].strip() if len(parts) > 1 else "Hasjob Startup"
+
+            out.append(Job(
+                job_id=f"hasjob:{abs(hash(link))}",
+                ats="hasjob",
+                company=company,
+                title=title,
+                location="India / Remote",
+                url=link,
+                description=strip_html(content),
+                posted_at=pub,
+            ))
+    except Exception:
+        pass
+    return out
+
+
 ENDPOINTS = {
     "greenhouse":       ("https://boards-api.greenhouse.io/v1/boards/{slug}/jobs?content=true", parse_greenhouse),
     "lever":            ("https://api.lever.co/v0/postings/{slug}?mode=json", parse_lever),
@@ -311,6 +363,8 @@ REMOTE_FEEDS = {
     "remoteok":   ("https://remoteok.com/api", parse_remoteok),
     "arbeitnow":  ("https://www.arbeitnow.com/api/job-board-api", parse_arbeitnow),
     "jobicy":     ("https://jobicy.com/api/v2/remote-jobs?count=50&industry=engineering", parse_jobicy),
+    "himalayas":  ("https://himalayas.app/jobs/api?limit=50", parse_himalayas),
+    "hasjob":     ("https://hasjob.co/feed", None),
 }
 
 
@@ -332,9 +386,19 @@ def fetch_board(ats: str, slug: str, company: str | None = None,
 
 def fetch_remote_feed(feed_name: str, session: requests.Session | None = None) -> list[Job]:
     """Hit a free public remote job aggregator feed."""
+    if feed_name == "hasjob":
+        sess = session or requests
+        try:
+            r = sess.get("https://hasjob.co/feed", headers=UA, timeout=TIMEOUT)
+            if r.status_code == 200:
+                return parse_hasjob_xml(r.text)
+        except Exception:
+            return []
     if feed_name not in REMOTE_FEEDS:
         return []
     url, parser = REMOTE_FEEDS[feed_name]
+    if parser is None:
+        return []
     sess = session or requests
     try:
         r = sess.get(url, headers=UA, timeout=TIMEOUT)
@@ -403,10 +467,10 @@ def fetch_linkedin(query: str, location: str = "India", count: int = 25) -> list
     return out
 
 
-def fetch_unstop(query: str, count: int = 25) -> list[Job]:
-    """Fetch live off-campus fresher & junior jobs from Unstop's public API."""
+def fetch_unstop(query: str, count: int = 25, opportunity: str = "jobs") -> list[Job]:
+    """Fetch live off-campus fresher & junior jobs or internships from Unstop's public API."""
     import urllib.parse
-    url = f"https://unstop.com/api/public/opportunity/search-result?opportunity=jobs&per_page={count}&searchTerm={urllib.parse.quote(query)}"
+    url = f"https://unstop.com/api/public/opportunity/search-result?opportunity={opportunity}&per_page={count}&searchTerm={urllib.parse.quote(query)}"
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "application/json",
@@ -431,14 +495,15 @@ def fetch_unstop(query: str, count: int = 25) -> list[Job]:
             loc = ", ".join(loc_list) if loc_list else "India"
 
             slug = re.sub(r'[^a-zA-Z0-9]', '', org.lower())[:15] or "unstop"
+            opp_label = "Internship" if opportunity == "internships" else "Job"
             out.append(Job(
-                job_id=f"unstop:{slug}:{jid}",
+                job_id=f"unstop:{slug}:{opportunity}:{jid}",
                 ats="unstop",
                 company=org,
                 title=title,
                 location=loc,
                 url=seo_url,
-                description=desc or f"{title} at {org}. Off-campus fresher opportunity on Unstop.",
+                description=desc or f"{title} at {org}. Off-campus fresher {opp_label} opportunity on Unstop.",
                 posted_at=posted,
             ))
             if len(out) >= count:
@@ -481,12 +546,14 @@ def fetch_all(companies: Iterable[dict], include_remote_feeds: bool = True,
                     fut = executor.submit(fetch_linkedin, q, loc)
                     fut_map[fut] = (f"LinkedIn ({q} - {loc})", "linkedin")
 
-        # Submit Unstop search queries
+        # Submit Unstop search queries (both jobs and internships)
         if unstop_searches:
             for q in unstop_searches:
                 if q:
-                    fut = executor.submit(fetch_unstop, q)
-                    fut_map[fut] = (f"Unstop ({q})", "unstop")
+                    fut_jobs = executor.submit(fetch_unstop, q, 25, "jobs")
+                    fut_map[fut_jobs] = (f"Unstop Jobs ({q})", "unstop")
+                    fut_interns = executor.submit(fetch_unstop, q, 25, "internships")
+                    fut_map[fut_interns] = (f"Unstop Intern ({q})", "unstop")
 
         for fut in concurrent.futures.as_completed(fut_map):
             name, src = fut_map[fut]
